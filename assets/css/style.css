@@ -9,13 +9,18 @@
   --color-accent: #dce9b8;
   --font-body: "Segoe UI", Arial, sans-serif;
   --radius: 12px;
+  --anchor-offset: 104px;
 }
 * {
   box-sizing: border-box;
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 96px;
+  scroll-padding-top: var(--anchor-offset);
+}
+main > section[id],
+main[id] {
+  scroll-margin-top: 20px;
 }
 body {
   margin: 0;
@@ -34,17 +39,25 @@ a {
   color: inherit;
   text-underline-offset: 4px;
 }
-a, button {
+a,
+button {
   -webkit-tap-highlight-color: transparent;
 }
-a, button, label {
-  transition: color 180ms, background-color 180ms, border-color 180ms, transform 180ms;
+a,
+button,
+label {
+  transition:
+    color 180ms,
+    background-color 180ms,
+    border-color 180ms,
+    transform 180ms;
 }
 :focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 5px;
 }
-button, input {
+button,
+input {
   font: inherit;
 }
 fieldset {
@@ -61,21 +74,29 @@ button:disabled {
 [hidden] {
   display: none !important;
 }
-h1, h2, h3, h4, p, figure {
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
   margin: 0;
 }
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   line-height: 1.12;
 }
 h2 {
   font-size: clamp(1.9rem, 3.2vw, 2.9rem);
   font-weight: 650;
-  letter-spacing: -.045em;
+  letter-spacing: -0.045em;
 }
 h3 {
   font-size: 1.2rem;
   font-weight: 650;
-  letter-spacing: -.025em;
+  letter-spacing: -0.025em;
 }
 .container {
   width: min(100% - 64px, 1280px);
@@ -112,7 +133,7 @@ h3 {
   align-items: center;
   gap: 9px;
   font-size: 1.48rem;
-  letter-spacing: -.06em;
+  letter-spacing: -0.06em;
   font-weight: 750;
   text-decoration: none;
   white-space: nowrap;
@@ -151,10 +172,11 @@ h3 {
 .main-navigation a {
   padding: 10px 0;
   text-decoration: none;
-  font-size: .86rem;
+  font-size: 0.86rem;
   color: var(--color-muted);
 }
-.main-navigation a:hover, .main-navigation a[aria-current] {
+.main-navigation a:hover,
+.main-navigation a[aria-current] {
   color: var(--color-primary);
 }
 .main-navigation a[aria-current] {
@@ -171,10 +193,11 @@ h3 {
   border-radius: 7px;
   background: var(--color-primary);
   color: white;
-  font-size: .86rem;
+  font-size: 0.86rem;
   font-weight: 600;
   line-height: 1.4;
   text-decoration: none;
+  transition: transform 0.3s ease;
 }
 .button:hover {
   background: var(--color-primary-hover);
@@ -185,24 +208,24 @@ h3 {
 .button-small {
   min-height: 42px;
   padding: 10px 18px;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 .menu-toggle {
   display: none;
 }
 .hero {
-  padding-top: 52px;
+  padding-top: 42px;
 }
 .hero-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  grid-template-columns: 0.94fr 1.06fr;
+  gap: 54px;
   align-items: center;
 }
 .eyebrow {
-  font-size: .66rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: .14em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-muted);
   margin-bottom: 22px;
@@ -219,9 +242,9 @@ h3 {
 }
 h1 {
   font-size: clamp(3.6rem, 6.2vw, 6rem);
-  letter-spacing: -.065em;
+  letter-spacing: -0.065em;
   font-weight: 650;
-  line-height: .99;
+  line-height: 0.99;
 }
 h1 span {
   color: var(--color-primary);
@@ -243,7 +266,7 @@ h1 span {
   display: inline-flex;
   align-items: center;
   gap: 18px;
-  font-size: .83rem;
+  font-size: 0.83rem;
   font-weight: 600;
   color: var(--color-primary);
   text-decoration: none;
@@ -254,147 +277,66 @@ h1 span {
 }
 .hero-note {
   margin-top: 28px;
-  font-size: .69rem;
+  font-size: 0.69rem;
   color: var(--color-muted);
 }
 .hero-note span {
   margin-inline: 10px;
   color: var(--color-border);
 }
-.hero-art {
-  position: relative;
+.hero-photo {
   min-width: 0;
-  background: var(--color-surface);
-  border-radius: 120px 12px 12px 12px;
-  padding: 38px 35px 22px;
-}
-.art-label {
   position: relative;
-  z-index: 1;
-  font-size: .64rem;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  text-align: right;
+  padding-bottom: 32px;
 }
-.botanical-art {
+.hero-photo > img {
+  display: block;
+  width: 100%;
+  height: 550px;
+  object-fit: cover;
+  object-position: 40% 75%;
+  border-radius: 80px 12px 12px 12px;
+}
+.photo-label {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  padding: 8px 13px;
+  border-radius: 4px;
+  background: var(--color-bg);
+  color: var(--color-primary);
+  font-size: 0.65rem;
+  letter-spacing: 0.07em;
+}
+.hero-photo-caption {
   position: relative;
-  height: 356px;
-  overflow: hidden;
-}
-.art-orbit {
-  position: absolute;
-  width: 310px;
-  height: 310px;
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-.orbit-two {
-  width: 230px;
-  height: 230px;
-}
-.orbit-three {
-  width: 150px;
-  height: 150px;
-}
-.leaf-stem {
-  position: absolute;
-  top: 70px;
-  bottom: 20px;
-  left: 50%;
-  width: 2px;
-  background: var(--color-primary);
-  transform: rotate(18deg);
-}
-.art-leaf {
-  position: absolute;
-  left: 50%;
-  top: 29%;
-  width: 94px;
-  height: 139px;
-  border-radius: 95% 0 95% 0;
-  background: var(--color-primary);
-  transform-origin: bottom left;
-  transform: rotate(-62deg);
-  box-shadow: inset -1px -1px 0 #ffffff20;
-}
-.art-leaf::after {
-  content: "";
-  position: absolute;
-  width: 1px;
-  height: 120px;
-  background: #ffffff40;
-  top: 24px;
-  left: 32px;
-  transform: rotate(34deg);
-}
-.leaf-two {
-  top: 46%;
-  transform: rotate(-74deg) scale(.85);
-  background: var(--color-primary-hover);
-}
-.leaf-three {
-  top: 61%;
-  left: 46%;
-  transform: rotate(-79deg) scale(.68);
-}
-.leaf-four {
-  top: 20%;
-  transform: rotate(6deg) scale(.9);
-  background: #719265;
-}
-.leaf-five {
-  top: 41%;
-  left: 47%;
-  transform: rotate(14deg) scale(.85);
-  background: #91ab78;
-}
-.leaf-six {
-  top: 59%;
-  left: 44%;
-  transform: rotate(22deg) scale(.66);
-  background: #b6c998;
-}
-.art-cross {
-  position: absolute;
-  color: var(--color-muted);
-  font-size: 23px;
-  font-weight: 300;
-}
-.cross-one {
-  left: 12%;
-  top: 22%;
-}
-.cross-two {
-  right: 8%;
-  bottom: 18%;
-}
-.art-caption {
-  border-top: 1px solid var(--color-border);
-  padding-top: 18px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: .6rem;
-  letter-spacing: .08em;
+  gap: 15px;
+  margin: -50px 24px 0 -25px;
+  padding: 23px 25px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  box-shadow: 0 8px 24px #1626210a;
+  color: var(--color-ink);
+  font-size: 0.82rem;
+}
+.hero-photo-caption strong {
   color: var(--color-muted);
+  font-size: 0.7rem;
+  font-weight: 400;
 }
-.art-caption strong {
-  font-size: .78rem;
+.photo-caption-number {
   color: var(--color-primary);
-  font-weight: 500;
-  letter-spacing: 0;
+  font-size: 0.68rem;
+  align-self: flex-start;
+  padding-top: 4px;
 }
-.art-arrow {
-  font-size: 28px;
+.photo-caption-arrow {
+  margin-left: auto;
   color: var(--color-primary);
-}
-.hero-art figcaption {
-  font-size: .59rem;
-  color: var(--color-muted);
-  margin-top: 15px;
+  font-size: 24px;
 }
 .hero-bottom {
   margin-top: 40px;
@@ -402,7 +344,7 @@ h1 span {
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
-  font-size: .72rem;
+  font-size: 0.72rem;
   color: var(--color-muted);
 }
 .hero-bottom a {
@@ -427,7 +369,7 @@ h1 span {
 .section-heading > p {
   max-width: 425px;
   justify-self: end;
-  font-size: .88rem;
+  font-size: 0.88rem;
   color: var(--color-muted);
 }
 .audience-section {
@@ -447,37 +389,78 @@ h1 span {
 }
 .audience-card {
   height: 100%;
-  position: relative;
-  padding: 29px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.4fr);
+  gap: 20px;
+  padding: 10px;
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
+  transition: transform 0.3s ease;
 }
+.audience-card:hover {
+  transform: translateY(-2px);
+}
+
 .card-icon {
   display: inline-flex;
-  width: 43px;
-  height: 43px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   align-items: center;
   justify-content: center;
   color: var(--color-primary);
   background: var(--color-surface);
-  font-size: 24px;
-}
-.card-number {
-  position: absolute;
-  right: 28px;
-  top: 31px;
-  font-size: .7rem;
-  color: var(--color-muted);
+  font-size: 21px;
 }
 .audience-card h3 {
-  margin: 26px 0 14px;
+  margin: 14px 0 10px;
+  font-size: 1.06rem;
 }
 .audience-card p {
-  font-size: .84rem;
+  font-size: 0.79rem;
   color: var(--color-muted);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+}
+.audience-photo {
+  position: relative;
+  min-width: 0;
+  min-height: 245px;
+  overflow: hidden;
+  border-radius: 7px;
+}
+.audience-photo img {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.audience-card:first-child img {
+  object-position: 55% center;
+}
+.audience-copy {
+  padding: 14px 10px 12px 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.audience-copy .text-link {
+  font-size: 0.73rem;
+  gap: 10px;
+  margin-top: auto;
+}
+.image-origin {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  width: fit-content;
+  padding: 3px 6px;
+  border-radius: 3px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-size: 0.6rem;
 }
 .viewer {
   border: 1px solid var(--color-border);
@@ -494,7 +477,7 @@ h1 span {
   border-bottom: 1px solid var(--color-border);
 }
 .viewer-title {
-  font-size: .83rem;
+  font-size: 0.83rem;
   font-weight: 650;
 }
 .toolbar-location {
@@ -503,9 +486,9 @@ h1 span {
   margin-left: 8px;
 }
 .phase-tag {
-  font-size: .57rem;
+  font-size: 0.57rem;
   font-weight: 600;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
   padding: 5px 9px;
   border-radius: 4px;
   background: var(--color-surface);
@@ -513,20 +496,20 @@ h1 span {
 }
 .viewer-body {
   display: grid;
-  grid-template-columns: 232px minmax(0, 1fr) 260px;
+  grid-template-columns: 220px minmax(0, 1fr) 246px;
 }
 .control-panel {
-  padding: 27px 22px;
+  padding: 26px 20px;
   border-right: 1px solid var(--color-border);
 }
 .panel-eyebrow {
   color: var(--color-muted);
-  font-size: .63rem;
-  margin-bottom: 7px;
+  font-size: 0.7rem;
+  margin-bottom: 8px;
 }
 .control-panel h3 {
-  font-size: 1.04rem;
-  margin-bottom: 30px;
+  font-size: 1.08rem;
+  margin-bottom: 28px;
 }
 .control-step {
   display: flex;
@@ -540,17 +523,17 @@ h1 span {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  font-size: .65rem;
+  font-size: 0.65rem;
   color: var(--color-primary);
   flex-shrink: 0;
 }
 .control-panel h4 {
-  font-size: .77rem;
+  font-size: 0.77rem;
   line-height: 22px;
   font-weight: 600;
 }
 .control-step p {
-  font-size: .72rem;
+  font-size: 0.76rem;
   color: var(--color-muted);
   margin-top: 7px;
 }
@@ -560,7 +543,7 @@ h1 span {
 }
 .radius-fieldset legend {
   float: none;
-  font-size: .77rem;
+  font-size: 0.77rem;
   font-weight: 600;
   margin-bottom: 13px;
 }
@@ -583,23 +566,24 @@ h1 span {
   text-align: center;
   border: 1px solid var(--color-border);
   border-radius: 5px;
-  padding: 8px;
-  font-size: .76rem;
+  padding: 10px 8px;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 .radius-options input:checked + label {
-  background: var(--color-surface);
+  background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-primary);
+  color: var(--color-bg);
   font-weight: 650;
 }
 .radius-options input:focus-visible + label {
   outline: 3px solid var(--color-primary);
   outline-offset: 3px;
 }
-.radius-fieldset > p, .help-text {
+.radius-fieldset > p,
+.help-text {
   color: var(--color-muted);
-  font-size: .67rem;
+  font-size: 0.67rem;
   margin-top: 11px;
   line-height: 1.6;
 }
@@ -608,7 +592,7 @@ h1 span {
   width: 100%;
   min-height: 42px;
   padding: 10px;
-  font-size: .77rem;
+  font-size: 0.77rem;
 }
 .analyze-button:disabled {
   color: var(--color-muted);
@@ -622,7 +606,7 @@ h1 span {
   padding-top: 20px;
 }
 .layer-status > p:not(.help-text) {
-  font-size: .72rem;
+  font-size: 0.72rem;
   margin-top: 12px;
 }
 .layer-symbol {
@@ -635,7 +619,7 @@ h1 span {
 .pending-label {
   display: inline-block;
   color: var(--color-muted);
-  font-size: .62rem;
+  font-size: 0.68rem;
 }
 .layer-status .pending-label {
   margin-left: 17px;
@@ -647,7 +631,7 @@ h1 span {
   background: var(--color-surface);
 }
 .map-canvas {
-  height: 565px;
+  height: 600px;
   position: relative;
   flex-grow: 1;
 }
@@ -689,7 +673,7 @@ arcgis-map {
 .map-message p {
   max-width: 310px;
   margin-top: 14px;
-  font-size: .8rem;
+  font-size: 0.8rem;
   color: var(--color-muted);
 }
 .map-bottom-bar {
@@ -701,14 +685,14 @@ arcgis-map {
   background: white;
   border-top: 1px solid var(--color-border);
   padding: 10px 15px;
-  font-size: .62rem;
+  font-size: 0.62rem;
   color: var(--color-muted);
 }
 .map-bottom-bar button {
   border: 0;
   padding: 4px 0;
   background: transparent;
-  font-size: .65rem;
+  font-size: 0.65rem;
   color: var(--color-primary);
 }
 .map-bottom-bar button:disabled {
@@ -718,7 +702,7 @@ arcgis-map {
   margin-left: 5px;
 }
 .results-panel {
-  padding: 25px 22px;
+  padding: 26px 20px;
   border-left: 1px solid var(--color-border);
 }
 .results-heading {
@@ -728,7 +712,7 @@ arcgis-map {
   gap: 10px;
 }
 .results-heading h3 {
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 .empty-results {
   padding-block: 35px 25px;
@@ -743,7 +727,7 @@ arcgis-map {
   margin-top: 12px;
 }
 .empty-results p {
-  font-size: .73rem;
+  font-size: 0.77rem;
   margin-top: 12px;
   color: var(--color-muted);
 }
@@ -755,9 +739,9 @@ arcgis-map {
 .result-indicators > div {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  font-size: .65rem;
-  padding-block: 5px;
+  gap: 10px;
+  font-size: 0.7rem;
+  padding-block: 6px;
 }
 .result-indicators dt {
   font-weight: 400;
@@ -772,23 +756,23 @@ arcgis-map {
   margin-top: 24px;
 }
 .results-list h4 {
-  font-size: .76rem;
+  font-size: 0.76rem;
 }
 .results-list p {
   margin-top: 9px;
-  font-size: .68rem;
+  font-size: 0.68rem;
   color: var(--color-muted);
 }
 .results-caution {
   margin-top: 26px;
-  padding: 12px;
+  padding: 13px;
   border-radius: 5px;
   background: var(--color-surface);
-  font-size: .64rem;
+  font-size: 0.7rem;
   color: var(--color-muted);
 }
 .map-footnote {
-  font-size: .69rem;
+  font-size: 0.69rem;
   color: var(--color-muted);
   margin-top: 17px;
 }
@@ -802,44 +786,85 @@ arcgis-map {
 .methodology-section {
   background: var(--color-surface);
 }
-.method-grid {
+.method-layout {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.5fr);
+  gap: 65px;
+  align-items: start;
 }
-.method-card {
-  padding: 26px 28px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-bg);
+.method-distance {
+  padding: 36px;
+  background: var(--color-primary);
+  border-radius: 10px;
+  color: var(--color-bg);
+}
+.method-distance .eyebrow {
+  color: var(--color-accent);
+}
+.method-distance h3 {
+  font-size: clamp(1.7rem, 2.3vw, 2.3rem);
+  font-weight: 500;
+  line-height: 1.15;
+}
+.distance-options {
+  display: flex;
+  gap: 30px;
+  margin-block: 32px 22px;
+  padding-block: 18px;
+  border-block: 1px solid #ffffff40;
+  font-size: 2.3rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+.distance-options small {
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+.method-distance > p:not(.eyebrow) {
+  font-size: 0.84rem;
+}
+.method-distance .method-note {
+  margin-top: 22px;
+  color: var(--color-accent);
+  font-size: 0.76rem;
+}
+.method-note-row {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 24px;
+  padding-block: 25px;
+  border-top: 1px solid var(--color-border);
+}
+.method-note-row:first-child {
+  padding-top: 10px;
+  border-top: 0;
 }
 .method-kicker {
-  font-size: .6rem;
-  letter-spacing: .1em;
   color: var(--color-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  padding-top: 4px;
 }
-.method-card h3 {
-  font-size: 1.45rem;
-  margin-block: 30px 20px;
+.method-note-row h3 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
 }
-.method-card p {
-  font-size: .81rem;
+.method-note-row p {
   color: var(--color-muted);
+  font-size: 0.83rem;
 }
-.method-card .text-link {
-  margin-top: 23px;
-  font-size: .75rem;
+.method-note-row .text-link {
+  margin-top: 15px;
+  font-size: 0.76rem;
 }
-.method-note {
-  margin-top: 20px;
-  border-top: 1px solid var(--color-border);
-  padding-top: 16px;
+.method-note-row .status-pill {
+  margin-top: 14px;
 }
 .status-pill {
   display: inline-flex;
   align-items: center;
   margin-top: 24px;
-  font-size: .67rem;
+  font-size: 0.67rem;
   color: var(--color-primary);
 }
 .process-list {
@@ -854,26 +879,37 @@ arcgis-map {
   position: relative;
 }
 .process-list li:not(:last-child)::after {
-  content: "→";
+  content: "";
   position: absolute;
-  left: 67px;
-  right: 0;
-  top: 7px;
-  border-bottom: 1px solid var(--color-border);
-  text-align: right;
-  font-size: 17px;
-  color: var(--color-muted);
+  left: 70px;
+  right: -9px;
+  top: 25px;
+  height: 1px;
+  background: var(--color-border);
+}
+.process-list li:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  right: -9px;
+  top: 22px;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid var(--color-muted);
+  border-right: 1px solid var(--color-muted);
+  transform: rotate(45deg);
 }
 .process-number {
   display: inline-flex;
-  width: 45px;
-  height: 45px;
+  width: 50px;
+  height: 50px;
   align-items: center;
   justify-content: center;
+  border: 1px solid var(--color-border);
   border-radius: 50%;
   background: var(--color-surface);
   color: var(--color-primary);
-  font-size: .8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 .process-list h3 {
   font-size: 1rem;
@@ -881,58 +917,77 @@ arcgis-map {
 }
 .process-list p {
   max-width: 240px;
-  font-size: .82rem;
+  font-size: 0.82rem;
   color: var(--color-muted);
 }
 .process-state {
   display: inline-block;
   margin-top: 17px;
   color: var(--color-muted);
-  font-size: .65rem;
+  font-size: 0.65rem;
 }
 .project-section {
   background: var(--color-surface);
   border-block: 1px solid var(--color-border);
-  padding-block: 65px;
+  padding-block: 0;
 }
 .project-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr 1.1fr;
   gap: 60px;
-  align-items: center;
+  align-items: stretch;
 }
 .project-grid > div > p:not(.eyebrow) {
   max-width: 550px;
-  font-size: .88rem;
+  font-size: 0.88rem;
   color: var(--color-muted);
   margin-top: 22px;
 }
 .project-grid > div > .project-disclaimer {
-  font-size: .74rem;
+  font-size: 0.74rem;
 }
 .project-grid .button {
   margin-top: 28px;
 }
-.project-mark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
+.project-copy {
+  padding-block: 62px;
+}
+.project-photo {
+  position: relative;
+  min-width: 0;
+  min-height: 430px;
+  grid-column: 1;
+  grid-row: 1;
+}
+.project-photo img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.project-copy {
+  grid-column: 2;
+  grid-row: 1;
+}
+.project-photo figcaption {
+  position: absolute;
+  inset: auto 20px 20px;
+  padding: 13px 16px;
+  border-radius: 5px;
+  background: var(--color-bg);
   color: var(--color-primary);
+  font-size: 0.8rem;
 }
-.project-mark .brand-leaf {
-  width: 75px;
-  height: 110px;
+.project-photo figcaption span {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.65rem;
 }
-.project-mark .brand-leaf::after {
-  height: 110px;
-  left: 37px;
-  top: 18px;
-}
-.project-mark > span:last-child {
-  text-align: center;
-  font-size: .75rem;
-  letter-spacing: .05em;
+.image-credits {
+  padding-block: 0 20px;
+  color: var(--color-muted);
+  font-size: 0.67rem;
 }
 .site-footer {
   padding-block: 35px 20px;
@@ -945,14 +1000,14 @@ arcgis-map {
   padding-bottom: 30px;
 }
 .footer-main p {
-  font-size: .68rem;
+  font-size: 0.68rem;
   color: var(--color-muted);
   margin-top: 10px;
 }
 .footer-main nav {
   display: flex;
   gap: 25px;
-  font-size: .75rem;
+  font-size: 0.75rem;
 }
 .footer-main nav a {
   text-decoration: none;
@@ -968,25 +1023,91 @@ arcgis-map {
   border-top: 1px solid var(--color-border);
   padding-top: 20px;
   color: var(--color-muted);
-  font-size: .6rem;
+  font-size: 0.6rem;
 }
 @media (min-width: 1440px) {
   .hero {
-    padding-top: 65px;
+    padding-top: 55px;
   }
   .hero-grid {
-    gap: 90px;
+    gap: 70px;
   }
-  .botanical-art {
-    height: 390px;
+  .hero-photo > img {
+    height: 580px;
   }
   .section {
-    padding-block: 90px;
+    padding-block: 85px;
   }
 }
-@media (max-width: 1199px) {
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hero-grid {
+    gap: 30px;
+  }
+  .hero-photo > img {
+    height: 530px;
+  }
+  .hero-photo-caption {
+    margin-left: 0;
+    margin-right: 15px;
+    padding: 18px;
+  }
+  .hero-photo-caption strong {
+    display: block;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+  .main-navigation {
+    gap: 22px;
+  }
+  .audience-card {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .audience-photo {
+    height: 170px;
+    min-height: 0;
+  }
+  .audience-photo img {
+    position: static;
+  }
+  .audience-copy {
+    padding: 20px 13px 16px;
+  }
+  .audience-card h3 {
+    min-height: 2.3em;
+  }
+  .audience-card p {
+    min-height: 6.6em;
+  }
   .viewer-body {
-    grid-template-columns: 210px minmax(0, 1fr);
+    grid-template-columns: 200px minmax(0, 1fr) 232px;
+  }
+  .control-panel,
+  .results-panel {
+    padding-inline: 16px;
+  }
+  .method-layout {
+    gap: 32px;
+    grid-template-columns: 0.9fr 1.3fr;
+  }
+  .method-distance {
+    padding: 26px;
+  }
+  .distance-options {
+    gap: 22px;
+    font-size: 2rem;
+  }
+  .method-note-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .project-grid {
+    gap: 35px;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .viewer-body {
+    grid-template-columns: 200px minmax(0, 1fr);
   }
   .results-panel {
     grid-column: 1 / -1;
@@ -995,6 +1116,7 @@ arcgis-map {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px 30px;
+    padding: 24px;
   }
   .results-heading {
     grid-column: 1 / -1;
@@ -1016,31 +1138,35 @@ arcgis-map {
     grid-column: 1 / -1;
     margin-top: 0;
   }
-  .map-canvas {
-    height: 540px;
+  .hero-photo > img {
+    height: 500px;
   }
-  .hero-grid {
-    gap: 35px;
+  .photo-label {
+    top: 18px;
+    right: 15px;
+    font-size: 0.58rem;
   }
-  .hero-art {
-    padding-inline: 24px;
+  .hero-photo-caption {
+    margin-right: 0;
+    gap: 10px;
   }
-  .main-navigation {
-    gap: 22px;
+  .photo-caption-number,
+  .photo-caption-arrow {
+    display: none;
   }
-  .method-grid {
-    gap: 16px;
+  .audience-photo {
+    height: 150px;
   }
-  .method-card {
-    padding-inline: 22px;
+  .project-grid {
+    gap: 25px;
+  }
+  .project-copy {
+    padding-block: 40px;
   }
 }
 @media (max-width: 767px) {
-  .audience-grid {
-    grid-template-columns: 1fr;
-  }
-  html {
-    scroll-padding-top: 85px;
+  :root {
+    --anchor-offset: 96px;
   }
   .container {
     width: calc(100% - 40px);
@@ -1065,7 +1191,7 @@ arcgis-map {
     border: 0;
     background: transparent;
     color: var(--color-primary);
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
   .main-navigation {
     flex-basis: 100%;
@@ -1077,27 +1203,27 @@ arcgis-map {
     padding-bottom: 16px;
   }
   .main-navigation a {
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
   .js-enabled .main-navigation:not(.is-open) {
     display: none;
   }
   .hero {
-    padding-top: 36px;
+    padding-top: 32px;
   }
   .hero-grid {
     grid-template-columns: 1fr;
-    gap: 35px;
+    gap: 30px;
   }
   .eyebrow {
-    font-size: .6rem;
+    font-size: 0.6rem;
     margin-bottom: 20px;
   }
   h1 {
     font-size: clamp(3.5rem, 11.8vw, 5.4rem);
   }
   .hero-description {
-    font-size: .9rem;
+    font-size: 0.9rem;
     margin-top: 24px;
   }
   .hero-actions {
@@ -1106,43 +1232,36 @@ arcgis-map {
   .hero-note {
     margin-top: 22px;
   }
-  .hero-art {
-    border-top-left-radius: 80px;
-    padding-top: 28px;
+  .hero-photo {
+    padding-bottom: 0;
   }
-  .botanical-art {
-    height: 290px;
+  .hero-photo > img {
+    height: 360px;
+    border-top-left-radius: 60px;
   }
-  .art-orbit {
-    width: 260px;
-    height: 260px;
+  .photo-label {
+    top: 17px;
+    right: 15px;
+    font-size: 0.6rem;
   }
-  .orbit-two {
-    width: 190px;
-    height: 190px;
+  .hero-photo-caption {
+    margin: -42px 14px 0;
+    padding: 17px 15px;
+    gap: 10px;
   }
-  .orbit-three {
-    width: 120px;
-    height: 120px;
+  .hero-photo-caption strong {
+    display: block;
+    font-size: 0.66rem;
+    line-height: 1.5;
+    margin-top: 4px;
   }
-  .art-leaf {
-    width: 76px;
-    height: 110px;
-  }
-  .art-leaf::after {
-    height: 90px;
-    left: 25px;
-  }
-  .leaf-stem {
-    top: 55px;
-  }
-  .art-label {
-    font-size: .57rem;
+  .photo-caption-number {
+    display: none;
   }
   .hero-bottom {
-    margin-top: 28px;
+    margin-top: 30px;
     gap: 16px;
-    font-size: .65rem;
+    font-size: 0.65rem;
   }
   .hero-bottom > span {
     max-width: 160px;
@@ -1161,28 +1280,41 @@ arcgis-map {
   .section-heading > p {
     justify-self: start;
     max-width: 520px;
-    font-size: .83rem;
+    font-size: 0.83rem;
+  }
+  .audience-grid {
+    grid-template-columns: 1fr;
   }
   .audience-card {
-    padding: 25px;
+    grid-template-columns: minmax(90px, 0.8fr) minmax(0, 1.45fr);
+    gap: 16px;
+    padding: 8px;
+  }
+  .audience-photo {
+    min-height: 235px;
+  }
+  .audience-copy {
+    padding: 12px 7px 12px 0;
   }
   .audience-card h3 {
-    margin-top: 18px;
+    margin-top: 13px;
+    font-size: 1rem;
   }
   .audience-card p {
-    margin-bottom: 18px;
+    font-size: 0.76rem;
+    margin-bottom: 14px;
   }
   .viewer-toolbar {
     padding: 14px;
   }
   .viewer-title {
-    font-size: .7rem;
+    font-size: 0.7rem;
   }
   .toolbar-location {
     display: none;
   }
   .phase-tag {
-    font-size: .5rem;
+    font-size: 0.5rem;
   }
   .viewer-body {
     grid-template-columns: 1fr;
@@ -1205,7 +1337,7 @@ arcgis-map {
     margin-top: 20px;
   }
   .map-canvas {
-    height: 430px;
+    height: 450px;
     flex-grow: 0;
   }
   .map-message {
@@ -1219,57 +1351,101 @@ arcgis-map {
     padding: 12px;
   }
   .results-panel {
-    display: block;
     padding: 23px;
+    border-left: 0;
+    border-top: 1px solid var(--color-border);
   }
   .empty-results {
-    padding-top: 20px;
+    padding-block: 20px;
   }
   .empty-results h4 {
     font-size: 1.1rem;
   }
   .empty-results p {
-    margin-bottom: 20px;
+    margin-bottom: 0;
   }
-  .results-list {
-    margin-top: 20px;
-  }
+  .results-list,
   .results-caution {
     margin-top: 20px;
   }
   .map-footnote {
-    font-size: .65rem;
+    font-size: 0.65rem;
   }
-  .method-grid {
+  .method-layout {
     grid-template-columns: 1fr;
+    gap: 28px;
   }
-  .method-card {
-    padding: 26px;
+  .method-distance {
+    padding: 28px;
   }
-  .method-card h3 {
-    margin-top: 20px;
+  .distance-options {
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .method-note-row {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    padding-block: 22px;
+  }
+  .method-note-row:first-child {
+    padding-top: 0;
+  }
+  .method-note-row h3 {
+    font-size: 1.12rem;
   }
   .process-list {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px 25px;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding-top: 5px;
   }
-  .process-list li:nth-child(2)::after {
+  .process-list li {
+    padding-left: 75px;
+  }
+  .process-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .process-list li:not(:last-child)::after {
+    left: 25px;
+    right: auto;
+    top: 62px;
+    bottom: -18px;
+    height: auto;
+    width: 1px;
+  }
+  .process-list li:not(:last-child)::before {
     display: none;
   }
   .process-list h3 {
-    margin-top: 17px;
+    margin: 0 0 10px;
+    padding-top: 4px;
   }
   .process-list p {
-    font-size: .77rem;
+    max-width: none;
+    font-size: 0.8rem;
   }
-  .project-section {
-    padding-block: 45px;
+  .process-state {
+    margin-top: 10px;
   }
   .project-grid {
     grid-template-columns: 1fr;
+    gap: 0;
   }
-  .project-mark {
-    display: none;
+  .project-copy {
+    grid-column: 1;
+    grid-row: 2;
+    padding-block: 35px 42px;
+  }
+  .project-photo {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 270px;
+    margin-inline: -20px;
+  }
+  .project-photo figcaption {
+    inset: auto 20px 16px;
+    width: fit-content;
   }
   .footer-main {
     align-items: flex-start;
@@ -1285,7 +1461,9 @@ arcgis-map {
   html {
     scroll-behavior: auto;
   }
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     transition: none !important;
     animation: none !important;
   }

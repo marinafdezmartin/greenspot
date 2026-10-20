@@ -15,12 +15,12 @@ menuToggle.addEventListener("click", () => {
   const isOpen = navigation.classList.toggle("is-open");
   menuToggle.setAttribute("aria-expanded", String(isOpen));
 });
-navigation.addEventListener("click", (event) => {
-  const link = event.target.closest("a");
-  if (!link) return;
+document.addEventListener("click", (event) => {
+  const link = event.target.closest('a[href^="#"]');
+  if (!link || !document.querySelector(link.hash)) return;
   closeMenu();
   // Move focus away from an anchor hidden by the mobile menu.
-  if (mobileLayout.matches) {
+  if (mobileLayout.matches && navigation.contains(link)) {
     const target = document.querySelector(link.hash);
     target.setAttribute("tabindex", "-1");
     target.focus({ preventScroll: true });

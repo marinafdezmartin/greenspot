@@ -48,26 +48,15 @@
               Prototipo WebGIS <span aria-hidden="true">/</span> Madrid <span aria-hidden="true">/</span> Fase A
             </p>
           </div>
-          <figure class="hero-art">
-            <div class="art-label">
-              <span class="small-dot" aria-hidden="true"></span> Una ciudad, otra perspectiva
-            </div>
-            <div class="botanical-art" aria-hidden="true">
-              <div class="art-orbit orbit-one">
-              </div>
-              <div class="art-orbit orbit-two">
-              </div>
-              <div class="art-orbit orbit-three">
-              </div>
-              <div class="leaf-stem">
-              </div>
-              <i class="art-leaf leaf-one"></i><i class="art-leaf leaf-two"></i><i class="art-leaf leaf-three"></i><i class="art-leaf leaf-four"></i><i class="art-leaf leaf-five"></i><i class="art-leaf leaf-six"></i><span class="art-cross cross-one">+</span><span class="art-cross cross-two">+</span>
-            </div>
-            <div class="art-caption">
-              <span>MADRID<br><strong>Naturaleza en el entorno urbano</strong></span><span class="art-arrow" aria-hidden="true">↗</span>
-            </div>
-            <figcaption>
-              Ilustración conceptual · no representa un mapa ni resultados.
+          <figure class="hero-photo">
+            <img src="assets/img/gallery/madrid.jpg" width="5209" height="3473"
+              alt="La catedral de la Almudena y los tejados de Madrid entre las copas de los árboles al atardecer."
+              fetchpriority="high" decoding="async">
+            <div class="photo-label"><span class="small-dot" aria-hidden="true"></span> Madrid, otra perspectiva</div>
+            <figcaption class="hero-photo-caption">
+              <span class="photo-caption-number" aria-hidden="true">01 /</span>
+              <span>La ciudad y su naturaleza.<br><strong>Un territorio que merece una mirada más cercana.</strong></span>
+              <span class="photo-caption-arrow" aria-hidden="true">↗</span>
             </figcaption>
           </figure>
         </div>
@@ -93,38 +82,45 @@
           <div class="row g-3 audience-grid">
             <div class="col-md-4">
               <article class="audience-card">
-                <span class="card-icon" aria-hidden="true">◎</span><span class="card-number" aria-hidden="true">01</span>
-                <h3>
-                  Ciudadanía
-                </h3>
-                <p>
-                  Explorar el territorio y comprender qué significa tener un espacio verde cerca, con una metodología clara y sus límites a la vista.
-                </p>
-                <a class="text-link" href="#mapa">Explorar Madrid <span aria-hidden="true">↗</span></a>
+                <div class="audience-photo">
+                  <img src="assets/img/gallery/ciudadania.jpg" width="6048" height="4032"
+                    alt="Personas contemplando las copas de los árboles y el horizonte urbano de Madrid." loading="lazy" decoding="async">
+                </div>
+                <div class="audience-copy">
+                  <span class="card-icon" aria-hidden="true">◎</span>
+                  <h3>Ciudadanía</h3>
+                  <p>Explorar Madrid y comprender la proximidad a zonas verdes, con sus límites a la vista.</p>
+                  <a class="text-link" href="#mapa">Explorar Madrid <span aria-hidden="true">↗</span></a>
+                </div>
               </article>
             </div>
             <div class="col-md-4">
               <article class="audience-card">
-                <span class="card-icon" aria-hidden="true">▥</span><span class="card-number" aria-hidden="true">02</span>
-                <h3>
-                  Urbanismo
-                </h3>
-                <p>
-                  Conocer un enfoque de proximidad espacial que puede servir como punto de partida para estudiar la relación entre ciudad y naturaleza.
-                </p>
-                <a class="text-link" href="#metodologia">Conocer el enfoque <span aria-hidden="true">↗</span></a>
+                <div class="audience-photo">
+                  <img src="assets/img/gallery/urbanismo.jpg" width="5184" height="3456"
+                    alt="Fachadas y balcones de los edificios de una calle de Madrid." loading="lazy" decoding="async">
+                </div>
+                <div class="audience-copy">
+                  <span class="card-icon" aria-hidden="true">▥</span>
+                  <h3>Urbanismo</h3>
+                  <p>Conocer un enfoque espacial para estudiar la relación entre ciudad y naturaleza.</p>
+                  <a class="text-link" href="#metodologia">Conocer el enfoque <span aria-hidden="true">↗</span></a>
+                </div>
               </article>
             </div>
             <div class="col-md-4">
               <article class="audience-card">
-                <span class="card-icon" aria-hidden="true">⌘</span><span class="card-number" aria-hidden="true">03</span>
-                <h3>
-                  Profesionales GIS
-                </h3>
-                <p>
-                  Seguir un proyecto que conecta la preparación de datos en ArcGIS Pro con su futura integración y análisis en un visor web.
-                </p>
-                <a class="text-link" href="#proceso">Del dato al mapa <span aria-hidden="true">↗</span></a>
+                <div class="audience-photo">
+                  <img src="assets/img/gallery/profesionales-gis.png" width="1402" height="1122"
+                    alt="Ilustración generada con IA de una profesional utilizando una tableta en un entorno urbano con vegetación." loading="lazy" decoding="async">
+                  <span class="image-origin">Ilustración IA</span>
+                </div>
+                <div class="audience-copy">
+                  <span class="card-icon" aria-hidden="true">⌘</span>
+                  <h3>Profesionales GIS</h3>
+                  <p>Seguir el paso de los datos de ArcGIS Pro a su futura integración y análisis web.</p>
+                  <a class="text-link" href="#proceso">Del dato al mapa <span aria-hidden="true">↗</span></a>
+                </div>
               </article>
             </div>
           </div>
@@ -290,39 +286,39 @@
               ¿Qué parques y jardines quedan dentro de un radio alrededor de una ubicación? Este es el análisis previsto para la siguiente fase.
             </p>
           </div>
-          <div class="method-grid">
-            <article class="method-card">
-              <span class="method-kicker">01 / FUENTES</span>
-              <h3>
-                Datos abiertos,<br>con contexto.
-              </h3>
-              <p>
-                La fuente prevista es el portal de datos abiertos del Ayuntamiento de Madrid. Las capas concretas, su licencia, cobertura y atributos están pendientes de revisión.
-              </p>
-              <a class="text-link" href="https://datos.madrid.es/">Consultar la fuente prevista <span aria-hidden="true">↗</span></a>
-            </article>
-            <article class="method-card">
-              <span class="method-kicker">02 / DISTANCIA</span>
-              <h3>
-                Cerca, en<br>línea recta.
-              </h3>
-              <p>
-                Se prevén radios de 500 m y 1 km alrededor de un punto. El cálculo métrico empleará un método espacial adecuado y se contrastará con ArcGIS Pro.
-              </p>
-              <p class="method-note">
-                No mide rutas, tiempos a pie, accesibilidad universal ni cobertura demográfica.
-              </p>
-            </article>
-            <article class="method-card">
-              <span class="method-kicker">03 / ESTADO ACTUAL</span>
-              <h3>
-                Primero el visor.<br>Después, el análisis.
-              </h3>
-              <p>
-                Esta entrega prepara la interfaz y la conexión al mapa base de Esri. Las capas propias, la selección de ubicación y el análisis corresponden a la fase B.
-              </p>
-              <span class="status-pill"><span class="small-dot" aria-hidden="true"></span> Datos GIS pendientes</span>
-            </article>
+          <div class="method-layout">
+            <aside class="method-distance" aria-labelledby="distance-title">
+              <p class="eyebrow">La escala del análisis previsto</p>
+              <h3 id="distance-title">Proximidad<br>en línea recta.</h3>
+              <div class="distance-options"><span>500 <small>m</small></span><span>1 <small>km</small></span></div>
+              <p>Dos radios alrededor de una ubicación. Una pregunta espacial, con límites explícitos.</p>
+              <p class="method-note">No mide rutas, tiempos a pie, accesibilidad universal ni cobertura demográfica. No representa accesibilidad real por la red peatonal.</p>
+            </aside>
+            <div class="method-notes">
+              <article class="method-note-row">
+                <span class="method-kicker">01 / FUENTES</span>
+                <div>
+                  <h3>Datos abiertos, con contexto.</h3>
+                  <p>La fuente prevista es el portal de datos abiertos del Ayuntamiento de Madrid. Las capas concretas, su licencia, cobertura y atributos están pendientes de revisión.</p>
+                  <a class="text-link" href="https://datos.madrid.es/">Consultar la fuente prevista <span aria-hidden="true">↗</span></a>
+                </div>
+              </article>
+              <article class="method-note-row">
+                <span class="method-kicker">02 / MÉTODO</span>
+                <div>
+                  <h3>Distancias que se puedan verificar.</h3>
+                  <p>Se prevén radios de 500 m y 1 km alrededor de un punto. El cálculo métrico empleará un método espacial adecuado y se contrastará con ArcGIS Pro.</p>
+                </div>
+              </article>
+              <article class="method-note-row">
+                <span class="method-kicker">03 / ESTADO</span>
+                <div>
+                  <h3>Primero el visor. Después, el análisis.</h3>
+                  <p>Esta entrega prepara la interfaz y la conexión al mapa base de Esri. Las capas propias, la selección de ubicación y el análisis corresponden a la fase B.</p>
+                  <span class="status-pill"><span class="small-dot" aria-hidden="true"></span> Datos GIS pendientes</span>
+                </div>
+              </article>
+            </div>
           </div>
         </div>
       </section>
@@ -387,7 +383,7 @@
       </section>
       <section class="project-section" id="proyecto" aria-labelledby="project-title">
         <div class="container project-grid">
-          <div>
+          <div class="project-copy">
             <p class="eyebrow">
               Geografía para comprender la ciudad
             </p>
@@ -402,9 +398,12 @@
             </p>
             <a class="button" href="#mapa">Volver al mapa <span aria-hidden="true">↗</span></a>
           </div>
-          <div class="project-mark" aria-hidden="true">
-            <span class="brand-leaf"></span><span>Mirar. Comprender.<br>Conectar.</span>
-          </div>
+          <figure class="project-photo">
+            <img src="assets/img/gallery/madrid-verde.jpg" width="4032" height="2268"
+              alt="Un paseo arbolado de Madrid con jardines geométricos y estatuas a ambos lados."
+              loading="lazy" decoding="async">
+            <figcaption>Mirar. Comprender. Conectar.<span>Madrid, a otra escala.</span></figcaption>
+          </figure>
         </div>
       </section>
     </main>
@@ -421,6 +420,7 @@
             <a href="#mapa">Mapa</a><a href="#metodologia">Metodología</a><a href="#proyecto">Proyecto</a>
           </nav>
         </div>
+        <p class="image-credits">Fotografías: <a href="https://unsplash.com/license">Unsplash</a>. Imagen de profesionales GIS generada con IA.</p>
         <div class="footer-bottom">
           <span>GreenSpot · Prototipo demostrativo · 2026</span><span>Fuente prevista: <a href="https://datos.madrid.es/">Datos abiertos de Madrid</a></span><span>Mapa base: <a href="https://www.esri.com/en-us/legal/terms/data-attributions">Esri y proveedores</a></span>
         </div>

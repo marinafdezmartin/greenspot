@@ -29,7 +29,7 @@ No hay despliegue preparado ni autorizado. Para un futuro hosting estático habr
 | Archivo | Responsabilidad |
 | --- | --- |
 | `index.html` | Secciones, anclas, controles etiquetados y estado pendiente inicial. |
-| `assets/css/style.css` | Tokens, composición editorial, ilustración CSS original, responsive y movimiento reducido. |
+| `assets/css/style.css` | Tokens, composición editorial con fotografías locales, responsive y movimiento reducido. |
 | `assets/js/app.js` | Eventos DOM del menú, cierre con Escape, navegación activa y actualización del radio preparado. Importa e inicia el mapa. |
 | `assets/js/map.js` | Importación local protegida con try/catch, carga diferida del CDN, componente arcgis-map, estados, límites de espera y restablecimiento de vista. |
 | `assets/js/config.example.js` | Contrato de configuración sin credenciales. |
@@ -49,7 +49,9 @@ Disponibles: landing, anclas, menú móvil con teclado/Escape, enlaces a fuentes
 
 Pendientes de fase B: capas de parques/jardines, leyenda propia, selección de ubicación, buffers, identificación por geometrías reales, resaltado, recuento y listado. «Analizar» está deshabilitado y los resultados son pendientes. No se han descargado datos ni creado resultados ficticios. La proximidad prevista es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal.
 
-La maqueta original se conserva como referencia y nunca se publica dentro de la página. La galería estaba vacía: la composición botánica es HTML/CSS original y se identifica como conceptual. No se han incorporado fotografías ni recursos con licencia desconocida.
+La maqueta original se conserva como referencia y nunca se publica dentro de la página. En la segunda iteración visual se sustituyen las composiciones botánicas por imágenes locales de `assets/img/gallery/`, con procedencia confirmada por la propietaria. El hero utiliza `madrid.jpg`; las tarjetas, `ciudadania.jpg`, `urbanismo.jpg` y `profesionales-gis.png`; el cierre, `madrid-verde.jpg`. La imagen GIS se identifica como ilustración generada con IA. Véanse dimensiones, licencia declarada y créditos pendientes en [el registro de imágenes](assets/img/gallery/README.md).
+
+Esta iteración conserva la paleta, el titular, los CTA y el visor. Las tarjetas combinan fotografía y texto, la metodología separa los radios previstos de las notas explicativas, y el proceso se presenta como una línea temporal horizontal en escritorio y vertical en móvil. Los offsets de ancla dejan espacio bajo la cabecera; cualquier enlace interno cierra el menú móvil antes de navegar. `map.js`, la configuración de Esri y los datos GIS no se modifican.
 
 ## Comprobación manual
 
@@ -60,6 +62,8 @@ Sin archivo local debe aparecer el estado pendiente. La importación de un archi
 ## Verificación realizada
 
 Verificación de esta entrega: HTML con etiquetas equilibradas, identificadores únicos, anclas y referencias ARIA correctas; recursos locales accesibles por HTTP; exclusión de configuración local verificada con Git. En Edge sin interfaz se probaron 360/768/1024/1440 px sin desbordamiento horizontal, cambio de radio con flechas de teclado, menú móvil con barra espaciadora, Escape, foco de navegación y movimiento reducido. No se observaron excepciones JavaScript. Se revisaron capturas de escritorio y móvil.
+
+Segunda iteración visual: se repitieron las comprobaciones responsive e interacciones, se verificó la carga de las cinco imágenes locales y sus textos alternativos, y se comprobó que las anclas de mapa, metodología y proyecto dejan sus encabezados por debajo de la cabecera a los cuatro anchos. Los radios, menú, Escape y navegación por teclado siguen operativos. El HTML de la sección del visor se conservó exactamente; `map.js` y `config.example.js` conservan sus hashes previos. Las fotografías originales no se modificaron. Las comprobaciones no detectaron excepciones JavaScript ni desbordamientos horizontales.
 
 Límites de la prueba: el navegador del entorno bloqueó el CDN de Bootstrap (`ERR_NETWORK_ACCESS_DENIED`); la estructura principal conserva su diseño con el CSS propio. No se verificó el aspecto con el CSS remoto cargado. No había configuración local: se comprobó el aviso de ausencia, pero no la cartografía real, sus controles, atribución ni los fallos de autenticación/SDK en ejecución. Esas pruebas quedan pendientes en Live Server con tu clave. La comprobación local usó un servidor HTTP equivalente, no la extensión de VS Code. No se enviaron archivos a validadores remotos.
 
