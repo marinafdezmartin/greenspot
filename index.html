@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="GreenSpot: un prototipo WebGIS para explorar Madrid y conocer la futura metodología de proximidad en línea recta a parques y jardines.">
+    <meta name="theme-color" content="#244f36">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23244f36' d='M4 28C2 9 15 3 29 3 28 21 19 30 4 28Z'/%3E%3Cpath stroke='white' d='M7 26 24 8'/%3E%3C/svg%3E">
+    <title>
+      GreenSpot · Una mirada más verde a Madrid
+    </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script type="module" src="assets/js/app.js">
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#inicio" aria-label="GreenSpot, inicio"><span class="brand-leaf" aria-hidden="true"></span>GreenSpot<span class="brand-dot" aria-hidden="true">.</span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation" hidden>
+          Menú <span aria-hidden="true">☰</span>
+        </button>
+        <nav id="main-navigation" class="main-navigation" aria-label="Navegación principal">
+          <a href="#inicio" aria-current="location">Inicio</a><a href="#mapa">Mapa</a><a href="#metodologia">Metodología</a><a href="#proyecto">Proyecto</a>
+        </nav>
+        <a class="button button-small header-cta" href="#mapa">Abrir visor <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+    <main id="contenido" tabindex="-1">
+      <section class="hero" id="inicio" aria-labelledby="hero-title">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">
+              <span class="small-dot" aria-hidden="true"></span> Naturaleza, ciudad y datos
+            </p>
+            <h1 id="hero-title">
+              Una mirada<br>más <span>verde</span><br>a Madrid.
+            </h1>
+            <p class="hero-description">
+              La ciudad también se entiende desde sus parques. Explora Madrid y descubre cómo los datos geográficos pueden ayudarnos a estudiar la proximidad a sus zonas verdes.
+            </p>
+            <div class="hero-actions">
+              <a class="button" href="#mapa">Explorar el mapa <span aria-hidden="true">↗</span></a><a class="text-link" href="#proyecto">Conocer el proyecto <span aria-hidden="true">→</span></a>
+            </div>
+            <p class="hero-note">
+              Prototipo WebGIS <span aria-hidden="true">/</span> Madrid <span aria-hidden="true">/</span> Fase A
+            </p>
+          </div>
+          <figure class="hero-art">
+            <div class="art-label">
+              <span class="small-dot" aria-hidden="true"></span> Una ciudad, otra perspectiva
+            </div>
+            <div class="botanical-art" aria-hidden="true">
+              <div class="art-orbit orbit-one">
+              </div>
+              <div class="art-orbit orbit-two">
+              </div>
+              <div class="art-orbit orbit-three">
+              </div>
+              <div class="leaf-stem">
+              </div>
+              <i class="art-leaf leaf-one"></i><i class="art-leaf leaf-two"></i><i class="art-leaf leaf-three"></i><i class="art-leaf leaf-four"></i><i class="art-leaf leaf-five"></i><i class="art-leaf leaf-six"></i><span class="art-cross cross-one">+</span><span class="art-cross cross-two">+</span>
+            </div>
+            <div class="art-caption">
+              <span>MADRID<br><strong>Naturaleza en el entorno urbano</strong></span><span class="art-arrow" aria-hidden="true">↗</span>
+            </div>
+            <figcaption>
+              Ilustración conceptual · no representa un mapa ni resultados.
+            </figcaption>
+          </figure>
+        </div>
+        <div class="container hero-bottom">
+          <span>La geografía, más cerca de las personas.</span><a href="#perspectivas">Descubre el enfoque <span aria-hidden="true">↓</span></a>
+        </div>
+      </section>
+      <section class="section audience-section" id="perspectivas" aria-labelledby="audience-title">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">
+                Diferentes miradas, un mismo territorio
+              </p>
+              <h2 id="audience-title">
+                Conocimiento para una<br>ciudad más verde.
+              </h2>
+            </div>
+            <p>
+              Una forma de acercar la información geográfica a quienes viven, piensan y estudian la ciudad.
+            </p>
+          </div>
+          <div class="row g-3 audience-grid">
+            <div class="col-md-4">
+              <article class="audience-card">
+                <span class="card-icon" aria-hidden="true">◎</span><span class="card-number" aria-hidden="true">01</span>
+                <h3>
+                  Ciudadanía
+                </h3>
+                <p>
+                  Explorar el territorio y comprender qué significa tener un espacio verde cerca, con una metodología clara y sus límites a la vista.
+                </p>
+                <a class="text-link" href="#mapa">Explorar Madrid <span aria-hidden="true">↗</span></a>
+              </article>
+            </div>
+            <div class="col-md-4">
+              <article class="audience-card">
+                <span class="card-icon" aria-hidden="true">▥</span><span class="card-number" aria-hidden="true">02</span>
+                <h3>
+                  Urbanismo
+                </h3>
+                <p>
+                  Conocer un enfoque de proximidad espacial que puede servir como punto de partida para estudiar la relación entre ciudad y naturaleza.
+                </p>
+                <a class="text-link" href="#metodologia">Conocer el enfoque <span aria-hidden="true">↗</span></a>
+              </article>
+            </div>
+            <div class="col-md-4">
+              <article class="audience-card">
+                <span class="card-icon" aria-hidden="true">⌘</span><span class="card-number" aria-hidden="true">03</span>
+                <h3>
+                  Profesionales GIS
+                </h3>
+                <p>
+                  Seguir un proyecto que conecta la preparación de datos en ArcGIS Pro con su futura integración y análisis en un visor web.
+                </p>
+                <a class="text-link" href="#proceso">Del dato al mapa <span aria-hidden="true">↗</span></a>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section map-section" id="mapa" aria-labelledby="map-title">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">
+                El territorio como punto de partida
+              </p>
+              <h2 id="map-title">
+                Explora la proximidad<br>a zonas verdes.
+              </h2>
+            </div>
+            <p>
+              Un visor para recorrer Madrid. El análisis en radios de 500 m y 1 km se habilitará tras incorporar y validar los datos GIS.
+            </p>
+          </div>
+          <div class="viewer" data-map-state="loading">
+            <div class="viewer-toolbar">
+              <span class="viewer-title"><span class="small-dot" aria-hidden="true"></span> Visor GreenSpot <span class="toolbar-location">/ Madrid</span></span><span class="phase-tag">FASE A · PROTOTIPO</span>
+            </div>
+            <div class="viewer-body">
+              <aside class="control-panel" aria-labelledby="controls-title">
+                <p class="panel-eyebrow">
+                  Prepara tu exploración
+                </p>
+                <h3 id="controls-title">
+                  Tu entorno verde
+                </h3>
+                <div class="control-step">
+                  <span class="step-index" aria-hidden="true">1</span>
+                  <div>
+                    <h4>
+                      Ubicación
+                    </h4>
+                    <p>
+                      La selección de un punto estará disponible con los datos GIS.
+                    </p>
+                  </div>
+                </div>
+                <fieldset class="radius-fieldset" aria-describedby="radius-help">
+                  <legend>
+                    <span class="step-index" aria-hidden="true">2</span> Radio en línea recta
+                  </legend>
+                  <div class="radius-options">
+                    <input type="radio" name="radius" id="radius-500" value="500" checked><label for="radius-500">500 m</label><input type="radio" name="radius" id="radius-1000" value="1000"><label for="radius-1000">1 km</label>
+                  </div>
+                  <p id="radius-help">
+                    Opción preparatoria. No dibuja un radio ni calcula resultados.
+                  </p>
+                </fieldset>
+                <button class="button analyze-button" type="button" disabled aria-describedby="analysis-help">
+                  Analizar <span aria-hidden="true">↗</span>
+                </button>
+                <p id="analysis-help" class="help-text">
+                  Análisis disponible tras incorporar los datos GIS.
+                </p>
+                <div class="layer-status">
+                  <h4>
+                    Capas del proyecto
+                  </h4>
+                  <p>
+                    <span class="layer-symbol" aria-hidden="true"></span> Parques y jardines
+                  </p>
+                  <span class="pending-label">Pendiente de integración</span>
+                  <p class="help-text">
+                    La leyenda se mostrará con la capa validada.
+                  </p>
+                </div>
+              </aside>
+              <div class="map-column">
+                <div class="map-canvas" id="map-canvas" aria-busy="true">
+                  <div class="map-message" id="map-message" role="status" aria-live="polite" aria-atomic="true">
+                    <span class="map-message-icon" aria-hidden="true">◎</span>
+                    <h3 id="map-state-title">
+                      Preparando el visor
+                    </h3>
+                    <p id="map-state-description">
+                      Comprobando la configuración del mapa de Madrid.
+                    </p>
+                  </div>
+                </div>
+                <div class="map-bottom-bar">
+                  <span id="map-status" role="status" aria-live="polite">Inicializando visor</span>
+                  <button id="reset-map" type="button" disabled>
+                    Volver a Madrid <span aria-hidden="true">↺</span>
+                  </button>
+                </div>
+              </div>
+              <aside class="results-panel" aria-labelledby="results-title">
+                <div class="results-heading">
+                  <h3 id="results-title">
+                    Resultados
+                  </h3>
+                  <span class="pending-label">Pendientes</span>
+                </div>
+                <div class="empty-results">
+                  <span class="empty-icon" aria-hidden="true">⌖</span>
+                  <h4>
+                    El primer paso<br>son los datos.
+                  </h4>
+                  <p>
+                    Aún no se han integrado las capas de parques y jardines. Aquí aparecerán los resultados del análisis.
+                  </p>
+                </div>
+                <dl class="result-indicators">
+                  <div>
+                    <dt>
+                      Zonas verdes encontradas
+                    </dt>
+                    <dd>
+                      Pendiente
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>
+                      Radio preparado
+                    </dt>
+                    <dd id="selected-radius">
+                      500 m
+                    </dd>
+                  </div>
+                </dl>
+                <div class="results-list">
+                  <h4>
+                    Parques y jardines
+                  </h4>
+                  <p>
+                    Listado pendiente de datos validados.
+                  </p>
+                </div>
+                <p class="results-caution">
+                  La proximidad en línea recta no representa rutas, tiempos a pie ni accesibilidad real.
+                </p>
+              </aside>
+            </div>
+          </div>
+          <p class="map-footnote">
+            <span aria-hidden="true">ⓘ</span> Mapa base y análisis son independientes: explorar el mapa no genera resultados de proximidad.
+          </p>
+          <noscript>
+            <p class="noscript-note">
+              Activa JavaScript para cargar el mapa y utilizar los controles. El análisis GIS sigue pendiente de datos.
+            </p>
+          </noscript>
+        </div>
+      </section>
+      <section class="section methodology-section" id="metodologia" aria-labelledby="method-title">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">
+                Transparencia desde el origen
+              </p>
+              <h2 id="method-title">
+                Una pregunta sencilla.<br>Una metodología clara.
+              </h2>
+            </div>
+            <p>
+              ¿Qué parques y jardines quedan dentro de un radio alrededor de una ubicación? Este es el análisis previsto para la siguiente fase.
+            </p>
+          </div>
+          <div class="method-grid">
+            <article class="method-card">
+              <span class="method-kicker">01 / FUENTES</span>
+              <h3>
+                Datos abiertos,<br>con contexto.
+              </h3>
+              <p>
+                La fuente prevista es el portal de datos abiertos del Ayuntamiento de Madrid. Las capas concretas, su licencia, cobertura y atributos están pendientes de revisión.
+              </p>
+              <a class="text-link" href="https://datos.madrid.es/">Consultar la fuente prevista <span aria-hidden="true">↗</span></a>
+            </article>
+            <article class="method-card">
+              <span class="method-kicker">02 / DISTANCIA</span>
+              <h3>
+                Cerca, en<br>línea recta.
+              </h3>
+              <p>
+                Se prevén radios de 500 m y 1 km alrededor de un punto. El cálculo métrico empleará un método espacial adecuado y se contrastará con ArcGIS Pro.
+              </p>
+              <p class="method-note">
+                No mide rutas, tiempos a pie, accesibilidad universal ni cobertura demográfica.
+              </p>
+            </article>
+            <article class="method-card">
+              <span class="method-kicker">03 / ESTADO ACTUAL</span>
+              <h3>
+                Primero el visor.<br>Después, el análisis.
+              </h3>
+              <p>
+                Esta entrega prepara la interfaz y la conexión al mapa base de Esri. Las capas propias, la selección de ubicación y el análisis corresponden a la fase B.
+              </p>
+              <span class="status-pill"><span class="small-dot" aria-hidden="true"></span> Datos GIS pendientes</span>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section process-section" id="proceso" aria-labelledby="process-title">
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">
+                Del dato al mapa
+              </p>
+              <h2 id="process-title">
+                Un proceso abierto<br>y trazable.
+              </h2>
+            </div>
+            <p>
+              El flujo metodológico previsto, desde la preparación de la información hasta la comunicación de resultados.
+            </p>
+          </div>
+          <ol class="process-list">
+            <li>
+              <span class="process-number" aria-hidden="true">01</span>
+              <h3>
+                Preparar
+              </h3>
+              <p>
+                Revisar, limpiar y exportar las capas desde ArcGIS Pro a GeoJSON WGS84.
+              </p>
+              <span class="process-state">Pendiente · datos</span>
+            </li>
+            <li>
+              <span class="process-number" aria-hidden="true">02</span>
+              <h3>
+                Integrar
+              </h3>
+              <p>
+                Conectar los GeoJSON al visor y comprobar sus geometrías y atributos.
+              </p>
+              <span class="process-state">Pendiente · fase B</span>
+            </li>
+            <li>
+              <span class="process-number" aria-hidden="true">03</span>
+              <h3>
+                Analizar
+              </h3>
+              <p>
+                Construir el radio, identificar entidades reales y contrastar los cálculos.
+              </p>
+              <span class="process-state">Pendiente · fase B</span>
+            </li>
+            <li>
+              <span class="process-number" aria-hidden="true">04</span>
+              <h3>
+                Comunicar
+              </h3>
+              <p>
+                Mostrar los parques encontrados junto a las fuentes y límites del análisis.
+              </p>
+              <span class="process-state">Interfaz preparada</span>
+            </li>
+          </ol>
+        </div>
+      </section>
+      <section class="project-section" id="proyecto" aria-labelledby="project-title">
+        <div class="container project-grid">
+          <div>
+            <p class="eyebrow">
+              Geografía para comprender la ciudad
+            </p>
+            <h2 id="project-title">
+              Una Madrid más verde<br>empieza por conocerla.
+            </h2>
+            <p>
+              GreenSpot es un proyecto de portfolio y demostración técnica que une cartografía web, naturaleza urbana y comunicación de datos.
+            </p>
+            <p class="project-disclaimer">
+              Prototipo independiente. No es una herramienta oficial del Ayuntamiento de Madrid.
+            </p>
+            <a class="button" href="#mapa">Volver al mapa <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="project-mark" aria-hidden="true">
+            <span class="brand-leaf"></span><span>Mirar. Comprender.<br>Conectar.</span>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-main">
+          <div>
+            <a class="brand" href="#inicio"><span class="brand-leaf" aria-hidden="true"></span>GreenSpot<span class="brand-dot" aria-hidden="true">.</span></a>
+            <p>
+              Naturaleza más cerca. Geografía más clara.
+            </p>
+          </div>
+          <nav aria-label="Navegación del pie">
+            <a href="#mapa">Mapa</a><a href="#metodologia">Metodología</a><a href="#proyecto">Proyecto</a>
+          </nav>
+        </div>
+        <div class="footer-bottom">
+          <span>GreenSpot · Prototipo demostrativo · 2026</span><span>Fuente prevista: <a href="https://datos.madrid.es/">Datos abiertos de Madrid</a></span><span>Mapa base: <a href="https://www.esri.com/en-us/legal/terms/data-attributions">Esri y proveedores</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
