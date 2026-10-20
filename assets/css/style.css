@@ -214,13 +214,92 @@ h3 {
   display: none;
 }
 .hero {
-  padding-top: 42px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.99) 0%,
+    rgba(255, 255, 255, 0.95) 27%,
+    rgba(255, 255, 255, 0.78) 43%,
+    rgba(255, 255, 255, 0.12) 67%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+.hero-photo {
+  position: absolute;
+  inset: 0 0 0 20%;
+  z-index: -2;
+  mask-image: linear-gradient(to right, transparent 0%, black 25%, black 100%);
+}
+.hero-photo > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 65%;
 }
 .hero-grid {
-  display: grid;
-  grid-template-columns: 0.94fr 1.06fr;
-  gap: 54px;
+  display: flex;
   align-items: center;
+  min-height: 650px;
+  padding-block: 65px;
+}
+.hero-copy {
+  max-width: 550px;
+}
+.hero-description {
+  max-width: 455px;
+  font-size: 1rem;
+  color: var(--color-ink);
+  margin-top: 28px;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 30px;
+}
+.hero-actions .text-link {
+  padding: 10px 12px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.94);
+}
+.hero-note {
+  margin-top: 28px;
+  font-size: 0.69rem;
+  color: var(--color-ink);
+}
+.hero-note span {
+  margin-inline: 10px;
+  color: var(--color-muted);
+}
+.hero-bottom {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 19px 24px;
+  border: 1px solid var(--color-border);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: var(--color-bg);
+  font-size: 0.72rem;
+  color: var(--color-muted);
+}
+.hero-bottom a {
+  text-decoration: none;
+}
+.hero-bottom a span {
+  margin-left: 18px;
 }
 .eyebrow {
   font-size: 0.66rem;
@@ -249,19 +328,6 @@ h1 {
 h1 span {
   color: var(--color-primary);
 }
-.hero-description {
-  max-width: 455px;
-  font-size: 1rem;
-  color: var(--color-muted);
-  margin-top: 28px;
-}
-.hero-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-top: 30px;
-}
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -274,84 +340,6 @@ h1 span {
 .text-link:hover {
   color: var(--color-primary-hover);
   text-decoration: underline;
-}
-.hero-note {
-  margin-top: 28px;
-  font-size: 0.69rem;
-  color: var(--color-muted);
-}
-.hero-note span {
-  margin-inline: 10px;
-  color: var(--color-border);
-}
-.hero-photo {
-  min-width: 0;
-  position: relative;
-  padding-bottom: 32px;
-}
-.hero-photo > img {
-  display: block;
-  width: 100%;
-  height: 550px;
-  object-fit: cover;
-  object-position: 40% 75%;
-  border-radius: 80px 12px 12px 12px;
-}
-.photo-label {
-  position: absolute;
-  top: 22px;
-  right: 22px;
-  padding: 8px 13px;
-  border-radius: 4px;
-  background: var(--color-bg);
-  color: var(--color-primary);
-  font-size: 0.65rem;
-  letter-spacing: 0.07em;
-}
-.hero-photo-caption {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin: -50px 24px 0 -25px;
-  padding: 23px 25px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-bg);
-  box-shadow: 0 8px 24px #1626210a;
-  color: var(--color-ink);
-  font-size: 0.82rem;
-}
-.hero-photo-caption strong {
-  color: var(--color-muted);
-  font-size: 0.7rem;
-  font-weight: 400;
-}
-.photo-caption-number {
-  color: var(--color-primary);
-  font-size: 0.68rem;
-  align-self: flex-start;
-  padding-top: 4px;
-}
-.photo-caption-arrow {
-  margin-left: auto;
-  color: var(--color-primary);
-  font-size: 24px;
-}
-.hero-bottom {
-  margin-top: 40px;
-  padding-block: 20px;
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: var(--color-muted);
-}
-.hero-bottom a {
-  text-decoration: none;
-}
-.hero-bottom a span {
-  margin-left: 18px;
 }
 .section {
   padding-block: 80px;
@@ -412,6 +400,15 @@ h1 span {
   color: var(--color-primary);
   background: var(--color-surface);
   font-size: 21px;
+}
+.card-icon svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .audience-card h3 {
   margin: 14px 0 10px;
@@ -1026,36 +1023,11 @@ arcgis-map {
   font-size: 0.6rem;
 }
 @media (min-width: 1440px) {
-  .hero {
-    padding-top: 55px;
-  }
-  .hero-grid {
-    gap: 70px;
-  }
-  .hero-photo > img {
-    height: 580px;
-  }
   .section {
     padding-block: 85px;
   }
 }
 @media (min-width: 768px) and (max-width: 1199px) {
-  .hero-grid {
-    gap: 30px;
-  }
-  .hero-photo > img {
-    height: 530px;
-  }
-  .hero-photo-caption {
-    margin-left: 0;
-    margin-right: 15px;
-    padding: 18px;
-  }
-  .hero-photo-caption strong {
-    display: block;
-    line-height: 1.5;
-    margin-top: 4px;
-  }
   .main-navigation {
     gap: 22px;
   }
@@ -1138,22 +1110,6 @@ arcgis-map {
     grid-column: 1 / -1;
     margin-top: 0;
   }
-  .hero-photo > img {
-    height: 500px;
-  }
-  .photo-label {
-    top: 18px;
-    right: 15px;
-    font-size: 0.58rem;
-  }
-  .hero-photo-caption {
-    margin-right: 0;
-    gap: 10px;
-  }
-  .photo-caption-number,
-  .photo-caption-arrow {
-    display: none;
-  }
   .audience-photo {
     height: 150px;
   }
@@ -1208,66 +1164,12 @@ arcgis-map {
   .js-enabled .main-navigation:not(.is-open) {
     display: none;
   }
-  .hero {
-    padding-top: 32px;
-  }
-  .hero-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
   .eyebrow {
     font-size: 0.6rem;
     margin-bottom: 20px;
   }
   h1 {
     font-size: clamp(3.5rem, 11.8vw, 5.4rem);
-  }
-  .hero-description {
-    font-size: 0.9rem;
-    margin-top: 24px;
-  }
-  .hero-actions {
-    gap: 20px;
-  }
-  .hero-note {
-    margin-top: 22px;
-  }
-  .hero-photo {
-    padding-bottom: 0;
-  }
-  .hero-photo > img {
-    height: 360px;
-    border-top-left-radius: 60px;
-  }
-  .photo-label {
-    top: 17px;
-    right: 15px;
-    font-size: 0.6rem;
-  }
-  .hero-photo-caption {
-    margin: -42px 14px 0;
-    padding: 17px 15px;
-    gap: 10px;
-  }
-  .hero-photo-caption strong {
-    display: block;
-    font-size: 0.66rem;
-    line-height: 1.5;
-    margin-top: 4px;
-  }
-  .photo-caption-number {
-    display: none;
-  }
-  .hero-bottom {
-    margin-top: 30px;
-    gap: 16px;
-    font-size: 0.65rem;
-  }
-  .hero-bottom > span {
-    max-width: 160px;
-  }
-  .hero-bottom a {
-    text-align: right;
   }
   .section {
     padding-block: 52px;
@@ -1455,6 +1357,79 @@ arcgis-map {
   .footer-bottom {
     flex-direction: column;
     gap: 10px;
+  }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .hero-grid {
+    min-height: 640px;
+    padding-block: 55px;
+  }
+  .hero-copy {
+    max-width: 500px;
+  }
+  .hero-photo {
+    inset-inline-start: 4%;
+  }
+  .hero::before {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.99) 0%,
+      rgba(255, 255, 255, 0.96) 30%,
+      rgba(255, 255, 255, 0.82) 48%,
+      rgba(255, 255, 255, 0.12) 80%
+    );
+  }
+}
+@media (max-width: 767px) {
+  .hero-grid {
+    min-height: 820px;
+    align-items: flex-start;
+    padding-block: 38px 280px;
+  }
+  .hero-copy {
+    max-width: 500px;
+  }
+  .hero-photo {
+    inset: 0;
+  }
+  .hero-photo > img {
+    object-position: 34% bottom;
+  }
+  .hero::before {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.99) 0%,
+      rgba(255, 255, 255, 0.97) 38%,
+      rgba(255, 255, 255, 0.86) 53%,
+      rgba(255, 255, 255, 0.12) 76%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+  .hero-description {
+    font-size: 0.9rem;
+    margin-top: 24px;
+  }
+  .hero-actions {
+    gap: 12px 18px;
+    margin-top: 24px;
+  }
+  .hero-actions .text-link {
+    padding-inline: 0;
+    background: transparent;
+  }
+  .hero-note {
+    margin-top: 22px;
+  }
+  .hero-bottom {
+    padding: 16px;
+    gap: 16px;
+    font-size: 0.65rem;
+  }
+  .hero-bottom > span {
+    max-width: 160px;
+  }
+  .hero-bottom a {
+    text-align: right;
   }
 }
 @media (prefers-reduced-motion: reduce) {
