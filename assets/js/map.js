@@ -12,6 +12,7 @@ const resetButton = document.querySelector("#reset-map");
 const greenSpacesStatus = document.querySelector("#green-spaces-status");
 let mapStarted = false;
 
+// Muestra el estado del visor sin afectar al resto de la página.
 function setMapState(state, heading, detail) {
   document.querySelector(".viewer").dataset.mapState = state;
   canvas.setAttribute("aria-busy", String(state === "loading"));
@@ -25,6 +26,7 @@ function setMapState(state, heading, detail) {
   }
   resetButton.disabled = state !== "ready";
 }
+// Carga la configuración y crea un único mapa con sus capas y controles.
 export async function initializeMap() {
   // app.js inicia un único visor, aunque se vuelva a llamar a esta función.
   if (mapStarted) return;
@@ -36,16 +38,16 @@ export async function initializeMap() {
   } catch {
     setMapState(
       "unconfigured",
-      "Mapa pendiente de configuración",
-      "El visor de Madrid estará disponible cuando se añada la configuración local de Esri. Mientras tanto, puedes conocer la metodología y el proyecto.",
+      "Mapa no disponible",
+      "El mapa no está disponible en este momento. Puedes seguir conociendo la metodología y el proyecto.",
     );
     return;
   }
   if (!config || typeof config.apiKey !== "string" || !config.apiKey.trim()) {
     setMapState(
       "unconfigured",
-      "Mapa pendiente de configuración",
-      "Falta una API key válida en la configuración local de Esri. El análisis seguirá pendiente hasta incorporar los datos GIS.",
+      "Mapa no disponible",
+      "El mapa no está disponible en este momento. Puedes seguir conociendo la metodología y el proyecto.",
     );
     return;
   }
@@ -55,6 +57,7 @@ export async function initializeMap() {
   let gisAnalysis;
   let initializationTimeout;
 
+  // Libera el visor cuando falla, manteniendo el resto de la web utilizable.
   function showFailure() {
     if (failed) return;
     failed = true;
@@ -65,12 +68,13 @@ export async function initializeMap() {
     setMapState(
       "error",
       "No se ha podido cargar el mapa",
-      "Comprueba tu conexión, la vigencia de la clave y sus permisos para el mapa base y el dominio local. Después, recarga la página.",
+      "Comprueba tu conexión y recarga la página para volver a intentarlo.",
     );
     // Al retirar el componente se liberan la vista y sus eventos GIS.
     mapElement?.remove();
   }
 
+  // Recupera la vista general de Madrid y respeta el movimiento reducido.
   async function resetMap() {
     resetButton.disabled = true;
     try {
@@ -133,7 +137,7 @@ export async function initializeMap() {
         showFailure();
       } else if (event.layer.id === "espacios-verdes-madrid") {
         greenSpacesStatus.textContent =
-          "No se ha podido representar la capa. El mapa base sigue disponible.";
+          "No se pueden mostrar los espacios verdes. Puedes seguir explorando el mapa.";
       }
     });
     fatalErrorHandle = reactiveUtils.watch(
@@ -163,10 +167,10 @@ export async function initializeMap() {
     const loadedLayer = await addGreenSpacesLayer(mapElement.map);
     await mapElement.view.whenLayerView(loadedLayer);
     greenSpacesLayer = loadedLayer;
-    if (!failed) greenSpacesStatus.textContent = "Capa disponible";
+    if (!failed) greenSpacesStatus.textContent = "Datos disponibles";
   } catch {
     greenSpacesStatus.textContent =
-      "No se ha podido cargar la capa. El mapa base sigue disponible.";
+      "Los datos no están disponibles. Puedes seguir explorando el mapa.";
   }
 
   if (failed) return;
@@ -179,6 +183,6 @@ export async function initializeMap() {
     }
   } catch {
     document.querySelector("#buffer-status").textContent =
-      "No se ha podido preparar el buffer. Recarga la página. El mapa sigue disponible.";
+      "No se ha podido iniciar el análisis. Recarga la página para volver a intentarlo.";
   }
 }

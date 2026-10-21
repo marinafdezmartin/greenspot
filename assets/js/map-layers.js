@@ -1,3 +1,4 @@
+// Carga el GeoJSON, distingue sus categorías y devuelve la capa para consultarla.
 export async function addGreenSpacesLayer(map) {
   // 1. Importar las clases desde el SDK que map.js ya ha cargado
   const [SimpleFillSymbol, UniqueValueRenderer, GeoJSONLayer, PopupTemplate] =

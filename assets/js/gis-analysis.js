@@ -1,3 +1,4 @@
+// Conecta los controles con el mapa y prepara los gráficos del análisis.
 export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
   const [
     Graphic,
@@ -62,17 +63,19 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
   });
   mapElement.map.add(graphicsLayer);
 
+  // Vacía el resumen y los nombres antes de mostrar otro resultado.
   function clearResults() {
-    polygonCount.textContent = "Pendiente";
+    polygonCount.textContent = "—";
     for (const count of [parkCount, forestCount, recreationCount, otherCount]) {
-      count.textContent = "Pendiente";
+      count.textContent = "—";
     }
     otherCategoryRow.hidden = true;
     namedSpacesList.replaceChildren();
     namedSpacesList.hidden = true;
-    listMessage.textContent = "El listado estará disponible tras realizar la consulta.";
+    listMessage.textContent = "Aquí verás los espacios identificados por su nombre.";
   }
 
+  // Cuenta las áreas de cada categoría y muestra hasta diez nombres reales.
   function showResults(espaciosEncontrados) {
     let parks = 0;
     let forests = 0;
@@ -120,14 +123,15 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
       namedSpacesList.append(item);
     }
     if (espaciosEncontrados.length === 0) {
-      listMessage.textContent = "No se encontraron entidades que intersecten el buffer.";
+      listMessage.textContent = "No hay espacios verdes registrados en este radio.";
     } else if (namedSpaces.length === 0) {
-      listMessage.textContent = "Las entidades encontradas no tienen nombre en los datos de origen.";
+      listMessage.textContent = "Las áreas encontradas no tienen nombre en OpenStreetMap.";
     } else {
-      listMessage.textContent = `Se muestran ${visibleSpaces.length} de ${namedSpaces.length} entidades con nombre. Cada registro corresponde a una entidad poligonal.`;
+      listMessage.textContent = `Mostrando ${visibleSpaces.length} de ${namedSpaces.length} áreas con nombre.`;
     }
   }
 
+  // Al cambiar el punto o el radio, descarta el resumen y las respuestas antiguas.
   function invalidateAnalysis() {
     // Una respuesta pendiente ya no pertenece al punto o al radio actuales.
     queryVersion += 1;
@@ -137,17 +141,18 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     analysisState.textContent = "Sin analizar";
     clearResults();
     if (!greenSpacesLayer) {
-      analysisHelp.textContent = "Consulta no disponible: no se ha podido preparar la capa de espacios verdes.";
-      analysisResult.textContent = "Puedes seleccionar una ubicación y visualizar su buffer. La consulta requiere la capa de espacios verdes.";
+      analysisHelp.textContent = "Los datos no están disponibles. Recarga la página para volver a intentarlo.";
+      analysisResult.textContent = "No se pueden obtener resultados ahora. Puedes seguir explorando el mapa.";
     } else if (!currentBuffer) {
-      analysisHelp.textContent = "Selecciona una ubicación para habilitar la consulta espacial.";
-      analysisResult.textContent = "Selecciona una ubicación, elige el radio y pulsa Analizar zona.";
+      analysisHelp.textContent = "Selecciona una ubicación para empezar.";
+      analysisResult.textContent = "Tu resumen aparecerá aquí.";
     } else {
-      analysisHelp.textContent = "Pulsa Analizar zona para consultar los polígonos que intersectan el buffer.";
-      analysisResult.textContent = "Buffer actualizado. Pulsa Analizar zona para obtener el recuento.";
+      analysisHelp.textContent = "";
+      analysisResult.textContent = "Todo listo para analizar tu entorno.";
     }
   }
 
+  // Encuadra el radio y busca las áreas verdes que quedan dentro o lo tocan.
   async function analyzeZone() {
     if (!currentBuffer || !greenSpacesLayer || analyzing) return;
     analyzing = true;
@@ -161,7 +166,7 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     analyzeButton.setAttribute("aria-busy", "true");
     analysisState.textContent = "Consultando";
     clearResults();
-    analysisResult.textContent = "Consultando los espacios verdes que intersectan el buffer…";
+    analysisResult.textContent = "Buscando áreas verdes en tu entorno…";
 
     // Ampliar una copia de la extensión deja margen sin modificar el buffer.
     try {
@@ -171,7 +176,7 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     } catch (error) {
       // Un gesto o Restablecer mapa pueden interrumpir la navegación normalmente.
       if (error.name !== "AbortError" && version === queryVersion) {
-        bufferStatus.textContent = "No se ha podido encuadrar el buffer. La consulta sigue disponible.";
+        bufferStatus.textContent = "No se ha podido centrar el mapa. Puedes continuar el análisis.";
       }
     }
     if (version !== queryVersion) return;
@@ -192,11 +197,11 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
       if (espaciosEncontrados.length === 0) {
         analysisState.textContent = "Consulta sin resultados";
       }
-      analysisResult.textContent = `${espaciosEncontrados.length} polígonos de espacios verdes encontrados en un radio de ${radiusLabel}.`;
+      analysisResult.textContent = `Áreas verdes en un radio de ${radiusLabel} alrededor del punto elegido.`;
     } catch {
       if (version !== queryVersion) return;
       analysisState.textContent = "Error de consulta";
-      analysisResult.textContent = "No se ha podido consultar la capa. Pulsa Analizar zona para intentarlo de nuevo.";
+      analysisResult.textContent = "No se han podido obtener los resultados. Vuelve a intentarlo.";
     } finally {
       // Una consulta antigua tampoco debe cambiar el botón de otra más reciente.
       if (version === queryVersion) {
@@ -207,6 +212,7 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     }
   }
 
+  // Activa el clic de selección y pausa los popups hasta elegir el punto.
   function setSelectionMode(enabled) {
     if (enabled === selectingLocation) return;
     selectingLocation = enabled;
@@ -231,6 +237,7 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     }
   }
 
+  // Genera el buffer en metros y sustituye los gráficos de la ubicación anterior.
   function updateBuffer() {
     if (!selectedPoint) return;
     currentBuffer = null;
@@ -265,17 +272,18 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
       currentBuffer = bufferGeometry;
       let radiusLabel = "500";
       if (radius === 1000) radiusLabel = "1.000";
-      bufferStatus.textContent = `Ubicación seleccionada. Buffer de ${radiusLabel} m. Proximidad en línea recta.`;
+      bufferStatus.textContent = `Ubicación elegida · radio de ${radiusLabel} m.`;
       if (selectingLocation) {
         bufferStatus.textContent += " Pulsa en el mapa para cambiar la ubicación; Escape cancela.";
       }
     } catch {
       bufferStatus.textContent =
-        "No se ha podido dibujar el buffer. Cambia el radio o selecciona otra ubicación.";
+        "No se ha podido dibujar el radio. Cambia la distancia o elige otro punto.";
     }
     invalidateAnalysis();
   }
 
+  // Guarda la geometría del clic solo cuando está activo el modo de selección.
   function handleMapClick(event) {
     if (!selectingLocation || !event.mapPoint) return;
     event.stopPropagation();
@@ -293,10 +301,11 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     }
   }
 
+  // Sale del modo de selección sin borrar el punto que ya estaba elegido.
   function cancelSelection() {
     setSelectionMode(false);
     bufferStatus.textContent =
-      "Selección cancelada. Se conserva la ubicación anterior, si existe.";
+      "Selección cancelada.";
   }
 
   function handleEscape(event) {
@@ -316,9 +325,10 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
   selectButton.disabled = false;
   invalidateAnalysis();
   bufferStatus.textContent =
-    "Selecciona una ubicación para visualizar su radio en línea recta.";
+    "Pulsa el botón y elige un punto en el mapa.";
 
   return {
+    // Retira los eventos y gráficos si se cierra el visor.
     destroy() {
       setSelectionMode(false);
       clickHandle.remove();

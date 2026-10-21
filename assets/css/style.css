@@ -186,7 +186,6 @@ h3 {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  gap: 28px;
   min-height: 51px;
   padding: 13px 23px;
   border: 1px solid var(--color-primary);
@@ -197,7 +196,7 @@ h3 {
   font-weight: 600;
   line-height: 1.4;
   text-decoration: none;
-  transition: transform 0.3s ease;
+  transition: transform 180ms, background-color 180ms, border-color 180ms;
 }
 .button:hover {
   background: var(--color-primary-hover);
@@ -278,10 +277,6 @@ h3 {
   font-size: 0.69rem;
   color: var(--color-ink);
 }
-.hero-note span {
-  margin-inline: 10px;
-  color: var(--color-muted);
-}
 .hero-bottom {
   position: relative;
   display: flex;
@@ -297,9 +292,6 @@ h3 {
 }
 .hero-bottom a {
   text-decoration: none;
-}
-.hero-bottom a span {
-  margin-left: 18px;
 }
 .eyebrow {
   font-size: 0.66rem;
@@ -331,7 +323,6 @@ h1 span {
 .text-link {
   display: inline-flex;
   align-items: center;
-  gap: 18px;
   font-size: 0.83rem;
   font-weight: 600;
   color: var(--color-primary);
@@ -444,7 +435,6 @@ h1 span {
 }
 .audience-copy .text-link {
   font-size: 0.73rem;
-  gap: 10px;
   margin-top: auto;
 }
 .image-origin {
@@ -482,21 +472,12 @@ h1 span {
   font-weight: 400;
   margin-left: 8px;
 }
-.phase-tag {
-  font-size: 0.57rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  padding: 5px 9px;
-  border-radius: 4px;
-  background: var(--color-surface);
-  color: var(--color-primary);
-}
 .viewer-body {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 246px;
+  grid-template-columns: 210px minmax(0, 1fr) clamp(290px, 23vw, 350px);
 }
 .control-panel {
-  padding: 26px 20px;
+  padding: 22px 18px;
   border-right: 1px solid var(--color-border);
 }
 .panel-eyebrow {
@@ -506,7 +487,7 @@ h1 span {
 }
 .control-panel h3 {
   font-size: 1.08rem;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 .control-step {
   display: flex;
@@ -601,6 +582,9 @@ h1 span {
   font-size: 0.67rem;
   margin-top: 11px;
   line-height: 1.6;
+}
+.help-text:empty {
+  display: none;
 }
 .analyze-button {
   margin-top: 20px;
@@ -713,12 +697,10 @@ arcgis-map {
 .map-bottom-bar button:disabled {
   color: var(--color-muted);
 }
-.map-bottom-bar button span {
-  margin-left: 5px;
-}
 .results-panel {
-  padding: 26px 20px;
+  padding: 22px;
   border-left: 1px solid var(--color-border);
+  background: #fafcf9;
 }
 .results-heading {
   display: flex;
@@ -727,51 +709,98 @@ arcgis-map {
   gap: 10px;
 }
 .results-heading h3 {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
-.empty-results {
-  padding-block: 35px 25px;
+.results-heading .pending-label {
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: var(--color-surface);
+  font-size: 0.64rem;
 }
-.empty-icon {
-  font-size: 34px;
-  color: var(--color-primary);
-}
-.empty-results h4 {
-  font-size: 1.15rem;
-  line-height: 1.25;
-  margin-top: 12px;
-}
-.empty-results p {
-  font-size: 0.77rem;
-  margin-top: 12px;
+.results-status {
+  margin-block: 12px 18px;
   color: var(--color-muted);
+  font-size: 0.76rem;
 }
-.result-indicators {
+.result-summary {
   margin: 0;
-  border-block: 1px solid var(--color-border);
-  padding-block: 15px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
 }
-.result-indicators > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 0.7rem;
-  padding-block: 6px;
-}
-.result-indicators dt {
+.result-summary dt {
+  font-size: 0.74rem;
   font-weight: 400;
   color: var(--color-muted);
 }
-.result-indicators dd {
+.result-summary dd,
+.result-categories dd {
   margin: 0;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+.summary-total dd {
+  margin-block: 6px 14px;
+  font-size: 3.2rem;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  font-weight: 650;
+}
+.summary-radius {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+.summary-radius dd {
+  font-size: 0.8rem;
   font-weight: 600;
-  white-space: nowrap;
+}
+.result-categories {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 10px 0 0;
+}
+.result-categories > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+}
+.result-categories dt {
+  font-size: 0.65rem;
+  line-height: 1.35;
+  font-weight: 400;
+  color: var(--color-muted);
+}
+.result-categories dd {
+  font-size: 1.55rem;
+  line-height: 1;
+  font-weight: 600;
+}
+#other-category-row {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+}
+.results-note {
+  margin-top: 12px;
+  font-size: 0.67rem;
+  color: var(--color-muted);
 }
 .results-list {
   margin-top: 24px;
 }
 .results-list h4 {
-  font-size: 0.76rem;
+  font-size: 0.86rem;
 }
 .results-list p {
   margin-top: 9px;
@@ -782,25 +811,26 @@ arcgis-map {
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
-  max-height: 240px;
-  overflow-y: auto;
 }
 .named-spaces-list li {
-  padding-block: 9px;
-  border-top: 1px solid var(--color-border);
-  font-size: 0.74rem;
+  padding: 12px 14px;
+  margin-top: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  font-size: 0.77rem;
   overflow-wrap: anywhere;
 }
 .named-spaces-list span {
   display: block;
 }
 .named-spaces-list span + span {
-  margin-top: 3px;
+  margin-top: 5px;
   font-size: 0.68rem;
   color: var(--color-muted);
 }
 .results-caution {
-  margin-top: 26px;
+  margin-top: 20px;
   padding: 13px;
   border-radius: 5px;
   background: var(--color-surface);
@@ -811,9 +841,6 @@ arcgis-map {
   font-size: 0.69rem;
   color: var(--color-muted);
   margin-top: 17px;
-}
-.map-footnote span {
-  margin-right: 5px;
 }
 .noscript-note {
   padding: 15px;
@@ -893,16 +920,6 @@ arcgis-map {
   margin-top: 15px;
   font-size: 0.76rem;
 }
-.method-note-row .status-pill {
-  margin-top: 14px;
-}
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 24px;
-  font-size: 0.67rem;
-  color: var(--color-primary);
-}
 .process-list {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -922,17 +939,6 @@ arcgis-map {
   top: 25px;
   height: 1px;
   background: var(--color-border);
-}
-.process-list li:not(:last-child)::before {
-  content: "";
-  position: absolute;
-  right: -9px;
-  top: 22px;
-  width: 7px;
-  height: 7px;
-  border-top: 1px solid var(--color-muted);
-  border-right: 1px solid var(--color-muted);
-  transform: rotate(45deg);
 }
 .process-number {
   display: inline-flex;
@@ -955,12 +961,6 @@ arcgis-map {
   max-width: 240px;
   font-size: 0.82rem;
   color: var(--color-muted);
-}
-.process-state {
-  display: inline-block;
-  margin-top: 17px;
-  color: var(--color-muted);
-  font-size: 0.65rem;
 }
 .project-section {
   background: var(--color-surface);
@@ -1066,6 +1066,59 @@ arcgis-map {
     padding-block: 85px;
   }
 }
+/* El visor cabe en escritorio; solo los paneles laterales desplazan su contenido. */
+@media (min-width: 992px) {
+  .map-section {
+    padding-block: 28px;
+    scroll-margin-top: 0;
+  }
+  .map-section > .container {
+    width: min(100% - 64px, 1680px);
+    max-width: 1680px;
+  }
+  .map-section .section-heading {
+    margin-bottom: 18px;
+    gap: 30px;
+  }
+  .map-section .section-heading .eyebrow {
+    margin-bottom: 8px;
+  }
+  .map-section h2 {
+    font-size: clamp(1.65rem, 2.2vw, 2.2rem);
+  }
+  .viewer {
+    display: flex;
+    flex-direction: column;
+    height: clamp(420px, calc(100dvh - 250px), 760px);
+  }
+  .viewer-toolbar {
+    flex-shrink: 0;
+    padding-block: 13px;
+  }
+  .viewer-body {
+    flex: 1;
+    min-height: 0;
+  }
+  .control-panel,
+  .results-panel {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  .map-column {
+    min-height: 0;
+  }
+  .map-canvas {
+    height: auto;
+    min-height: 0;
+    flex: 1;
+  }
+  .map-bottom-bar {
+    flex-shrink: 0;
+  }
+}
 @media (min-width: 768px) and (max-width: 1199px) {
   .main-navigation {
     gap: 22px;
@@ -1089,9 +1142,6 @@ arcgis-map {
   }
   .audience-card p {
     min-height: 6.6em;
-  }
-  .viewer-body {
-    grid-template-columns: 200px minmax(0, 1fr) 232px;
   }
   .control-panel,
   .results-panel {
@@ -1129,20 +1179,13 @@ arcgis-map {
     gap: 18px 30px;
     padding: 24px;
   }
-  .results-heading {
+  .results-heading,
+  .results-status,
+  .results-note {
     grid-column: 1 / -1;
   }
-  .empty-results {
-    padding: 0;
-    grid-row: span 2;
-  }
-  .empty-results h4 br {
-    display: none;
-  }
-  .empty-icon {
-    display: none;
-  }
   .results-list {
+    grid-column: 1 / -1;
     margin-top: 0;
   }
   .results-caution {
@@ -1254,9 +1297,6 @@ arcgis-map {
   .toolbar-location {
     display: none;
   }
-  .phase-tag {
-    font-size: 0.5rem;
-  }
   .viewer-body {
     grid-template-columns: 1fr;
   }
@@ -1295,15 +1335,6 @@ arcgis-map {
     padding: 23px;
     border-left: 0;
     border-top: 1px solid var(--color-border);
-  }
-  .empty-results {
-    padding-block: 20px;
-  }
-  .empty-results h4 {
-    font-size: 1.1rem;
-  }
-  .empty-results p {
-    margin-bottom: 0;
   }
   .results-list,
   .results-caution {
@@ -1355,9 +1386,6 @@ arcgis-map {
     height: auto;
     width: 1px;
   }
-  .process-list li:not(:last-child)::before {
-    display: none;
-  }
   .process-list h3 {
     margin: 0 0 10px;
     padding-top: 4px;
@@ -1365,9 +1393,6 @@ arcgis-map {
   .process-list p {
     max-width: none;
     font-size: 0.8rem;
-  }
-  .process-state {
-    margin-top: 10px;
   }
   .project-grid {
     grid-template-columns: 1fr;

@@ -6,6 +6,7 @@ const mobileLayout = window.matchMedia("(max-width: 767px)");
 document.documentElement.classList.add("js-enabled");
 menuToggle.hidden = false;
 
+// Cierra el menú móvil al navegar o pulsar Escape.
 function closeMenu() {
   navigation.classList.remove("is-open");
   menuToggle.setAttribute("aria-expanded", "false");
@@ -36,6 +37,7 @@ document.addEventListener("keydown", (event) => {
 mobileLayout.addEventListener("change", closeMenu);
 
 const navigationLinks = [...navigation.querySelectorAll("a")];
+// Destaca el enlace de la sección que se está leyendo.
 if ("IntersectionObserver" in window) {
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
@@ -53,6 +55,7 @@ if ("IntersectionObserver" in window) {
     observer.observe(document.querySelector(link.hash));
   }
 }
+// Refleja el radio elegido en el resumen; el módulo GIS actualiza la geometría.
 for (const radio of document.querySelectorAll('input[name="radius"]')) {
   radio.addEventListener("change", () => {
     if (radio.value === "1000") {

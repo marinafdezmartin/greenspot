@@ -1,13 +1,13 @@
 ﻿# GreenSpot
 
-Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.4A: encuadre del buffer y resumen de resultados**, sobre la consulta espacial y los buffers geodésicos de 500 y 1.000 metros existentes. Muestra el total de entidades poligonales intersectadas, su recuento por categoría y hasta diez entidades con nombre; no representa parques independientes. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y el diseño general.
+WebGIS independiente sobre proximidad a espacios verdes de Madrid. Permite seleccionar un punto, elegir 500 m o 1 km y consultar las áreas verdes que intersectan su buffer geodésico. El panel muestra el total, el desglose por categoría y hasta diez nombres reales. Las cifras representan áreas cartografiadas, no parques independientes. No es una herramienta oficial del Ayuntamiento de Madrid.
 
 ## Arrancar en VS Code
 
 1. Abre la carpeta `greenspot` en VS Code.
 2. Con Live Server instalado, pulsa con el botón derecho en `index.html` y elige **Open with Live Server**.
 3. Usa la URL HTTP indicada por Live Server. No abras el HTML con `file://`: los módulos ES necesitan un servidor.
-4. Sin configuración local verás «Mapa pendiente de configuración». La navegación, los enlaces, el menú móvil y el selector preparatorio de radio siguen disponibles.
+4. Sin configuración local verás «Mapa no disponible». La navegación, los enlaces, el menú móvil y el selector de radio siguen disponibles.
 
 No se necesita npm, Node ni compilación. Se usa HTML, CSS, JavaScript, Bootstrap **5.3.8** (CSS con integridad) y ArcGIS Maps SDK for JavaScript **5.1** (Map Components). La navegación se resuelve con JavaScript vanilla; no requiere el bundle de Bootstrap. Hace falta conexión a Internet para los CDN y el mapa base.
 
@@ -28,7 +28,7 @@ No hay despliegue preparado ni autorizado. Para un futuro hosting estático habr
 
 | Archivo | Responsabilidad |
 | --- | --- |
-| `index.html` | Secciones, anclas, controles etiquetados y estado pendiente inicial. |
+| `index.html` | Secciones, anclas, controles etiquetados y dashboard de resultados. |
 | `assets/css/style.css` | Tokens, composición editorial con fotografías locales, responsive y movimiento reducido. |
 | `assets/js/app.js` | Eventos DOM del menú, cierre con Escape, navegación activa y actualización del radio preparado. Importa e inicia el mapa. |
 | `assets/js/map.js` | Importación local protegida con try/catch, carga diferida del CDN, componente arcgis-map, estados, límites de espera y restablecimiento de vista. |
@@ -72,7 +72,7 @@ El módulo sigue el orden de los ejercicios de Esri:
 
 `osm_id`, `name`, `fclass` y las geometrías se conservan para trabajo posterior. El archivo original no se modifica; no se utiliza `Shape_Area` ni `Shape_Length` para mediciones. El módulo de capas no incorpora consultas espaciales ni cálculos; los buffers de B.2 viven en un módulo independiente.
 
-`map.js` espera también `view.whenLayerView()` para anunciar «Capa disponible». Los errores de la capa se notifican en el panel existente sin retirar el mapa base ni deshabilitar sus controles. El error general del visor se reserva a la inicialización, el mapa base y errores fatales de vista. La atribución de los datos aparece junto al visor, en el pie y en `GeoJSONLayer.copyright`, conservando las atribuciones de Esri: [© OpenStreetMap contributors (ODbL)](https://www.openstreetmap.org/copyright).
+`map.js` espera también `view.whenLayerView()` para anunciar «Datos disponibles». Los errores de la capa se notifican en el panel existente sin retirar el mapa base ni deshabilitar sus controles. El error general del visor se reserva a la inicialización, el mapa base y errores fatales de vista. La atribución de los datos aparece junto al visor, en el pie y en `GeoJSONLayer.copyright`, conservando las atribuciones de Esri: [© OpenStreetMap contributors (ODbL)](https://www.openstreetmap.org/copyright).
 
 ## Funciones y límites
 
@@ -127,7 +127,15 @@ La Query de B.3 se mantiene. `showResults(espaciosEncontrados)` recorre sus enti
 
 En el mismo bucle se lee `(attributes.name || "").trim()`: los nombres vacíos, nulos o solo con espacios no entran en el listado, pero sus entidades permanecen en los recuentos. Se conservan el orden de la consulta y los nombres reales; `slice(0, 10)` limita el listado. No se agrupan nombres repetidos porque son entidades poligonales distintas. Si ninguna tiene nombre, se muestra una explicación. Los elementos se crean mediante `document.createElement()` y `textContent`, sin interpretar HTML de los atributos.
 
-`clearResults()` limpia todos los indicadores y el listado al invalidar o comenzar una consulta. Se mantienen los estados sin analizar, consultando, consulta realizada, consulta sin resultados y error. La lista tiene altura máxima y desplazamiento con teclado para conservar el panel compacto; se mantienen la retícula y los puntos de adaptación existentes.
+`clearResults()` limpia todos los indicadores y el listado al invalidar o comenzar una consulta. Se mantienen los estados sin analizar, consultando, consulta realizada, consulta sin resultados y error. En escritorio el panel completo admite desplazamiento con teclado; el listado no tiene una barra independiente. En tablet y móvil el contenido sigue el desplazamiento de la página.
+
+### Diseño y textos públicos
+
+La interfaz no muestra fases, entregas ni tareas pendientes. Usa «Áreas verdes», «Zonas de parque», «Zonas de bosque», «Zonas recreativas» y «Espacios cercanos», manteniendo la precisión en la metodología: un mismo parque puede incluir varias áreas cartografiadas y la proximidad no garantiza acceso público ni una entrada dentro del radio.
+
+Desde 992 px de ancho, el visor mide `clamp(420px, calc(100dvh - 250px), 760px)`, incluyendo su cabecera y paneles. El grid permite que mapa y paneles se ajusten a esa altura, con desplazamiento independiente en cada columna lateral cuando hace falta. Solo la sección del mapa amplía su ancho hasta 1.680 px en monitores grandes. El dashboard conserva los IDs usados por JavaScript: total destacado, radio y tres tarjetas de categorías. Los estados vacíos usan una raya, no ceros ficticios.
+
+Los comentarios breves de las cuatro unidades JavaScript explican inicialización, carga, selección, buffer, consulta, presentación y limpieza sin cambiar el flujo GIS. Las referencias a fases se mantienen únicamente en esta documentación técnica e historial de pruebas.
 
 Pendientes tras B.4A: leyenda propia, resaltado y contraste independiente de resultados en ArcGIS Pro. No se calculan superficies, porcentajes, uniones ni índices. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear datos simulados. La proximidad es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a otra fase sin confirmación.
 
@@ -142,6 +150,16 @@ En Live Server revisa 360, 768, 1024 y 1440 px: ausencia de desbordamiento horiz
 Sin archivo local debe aparecer el estado pendiente. La importación de un archivo local ausente puede producir un 404 en desarrollo; se captura y no impide ejecutar la interfaz. Con clave vacía tampoco se carga el SDK. Con clave válida comprueba la cartografía real; con permisos incorrectos o red interrumpida, el aviso de error. No compartas capturas de red ni consola con tokens.
 
 ## Verificación realizada
+
+### Revisión visual, textos y comentarios
+
+- Visor completo y título visibles a 1366×768, 1440×900 y 1920×1080. Alturas del mapa medidas: aproximadamente 421, 553 y 663 px. También se revisaron 1024×768, 768×1024 y 360×800, sin desbordamiento horizontal.
+- En escritorio, un solo desplazamiento por panel lateral; lista sin altura máxima ni scroll propio. En móvil/tablet, contenido con scroll normal de página. Se comprobó PageDown con foco en el panel derecho y se inspeccionaron capturas de escritorio, tablet y móvil.
+- Revisión de textos públicos y botones: sin fases, entregas, etiquetas provisionales ni flechas decorativas. Se conserva el aviso de proyecto independiente, los límites de la proximidad y las atribuciones.
+- Regresión con el SDK real: mismos recuentos por categoría y mismos nombres que la consulta directa; selección, ambos radios, encuadre, popups, restablecimiento, entidades sin nombre y cero resultados operativos. Geometría del buffer sin cambios. Una respuesta antigua recibida después de la nueva no sobrescribe el resumen.
+- Menú móvil, Escape, anclas, movimiento reducido y desplazamiento con teclado comprobados; sin excepciones JavaScript en la comprobación final. Los cambios en JavaScript se limitan a comentarios y textos de presentación.
+
+Pruebas en Edge con servidor HTTP local equivalente a Live Server. El contraste independiente en ArcGIS Pro y la prueba desde la extensión de VS Code continúan pendientes. El GeoJSON conserva su hash; no se modifica la configuración privada ni se envían archivos a validadores externos.
 
 ### Fase B.4A
 
