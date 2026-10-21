@@ -50,7 +50,7 @@
               <a class="button" href="#mapa">Explorar el mapa <span aria-hidden="true">↗</span></a><a class="text-link" href="#proyecto">Conocer el proyecto <span aria-hidden="true">→</span></a>
             </div>
             <p class="hero-note">
-              Prototipo WebGIS <span aria-hidden="true">/</span> Madrid <span aria-hidden="true">/</span> Fase B.3
+              Prototipo WebGIS <span aria-hidden="true">/</span> Madrid <span aria-hidden="true">/</span> Fase B.4A
             </p>
           </div>
         </div>
@@ -137,7 +137,7 @@
           </div>
           <div class="viewer" data-map-state="loading">
             <div class="viewer-toolbar">
-              <span class="viewer-title"><span class="small-dot" aria-hidden="true"></span> Visor GreenSpot <span class="toolbar-location">/ Madrid</span></span><span class="phase-tag">FASE B.3 · PROTOTIPO</span>
+              <span class="viewer-title"><span class="small-dot" aria-hidden="true"></span> Visor GreenSpot <span class="toolbar-location">/ Madrid</span></span><span class="phase-tag">FASE B.4A · PROTOTIPO</span>
             </div>
             <div class="viewer-body">
               <aside class="control-panel" aria-labelledby="controls-title">
@@ -234,6 +234,22 @@
                     </dd>
                   </div>
                   <div>
+                    <dt>Polígonos de parques</dt>
+                    <dd id="park-count">Pendiente</dd>
+                  </div>
+                  <div>
+                    <dt>Polígonos de bosques</dt>
+                    <dd id="forest-count">Pendiente</dd>
+                  </div>
+                  <div>
+                    <dt>Polígonos de zonas recreativas</dt>
+                    <dd id="recreation-count">Pendiente</dd>
+                  </div>
+                  <div id="other-category-row" hidden>
+                    <dt>Sin clasificar</dt>
+                    <dd id="other-count">Pendiente</dd>
+                  </div>
+                  <div>
                     <dt>
                       Radio del buffer
                     </dt>
@@ -244,14 +260,15 @@
                 </dl>
                 <div class="results-list">
                   <h4>
-                    Parques y jardines
+                    Entidades con nombre
                   </h4>
-                  <p>
-                    Listado no disponible en esta fase. El recuento representa entidades poligonales, no parques independientes.
+                  <p id="list-message">
+                    El listado estará disponible tras realizar la consulta.
                   </p>
+                  <ul id="named-spaces-list" class="named-spaces-list" tabindex="0" aria-label="Hasta diez entidades poligonales con nombre" hidden></ul>
                 </div>
                 <p class="results-caution">
-                  La proximidad en línea recta no representa rutas, tiempos a pie ni accesibilidad real.
+                  Se cuentan entidades poligonales, no parques independientes. La proximidad en línea recta no representa rutas, tiempos a pie ni accesibilidad real.
                 </p>
               </aside>
             </div>
@@ -309,7 +326,7 @@
                 <span class="method-kicker">03 / ESTADO</span>
                 <div>
                   <h3>Primero el visor. Después, el análisis.</h3>
-                  <p>La fase B.3 consulta los polígonos que intersectan el buffer geodésico y muestra su número. La proximidad es en línea recta; el contraste independiente en ArcGIS Pro sigue pendiente.</p>
+                  <p>La fase B.4A encuadra el buffer y muestra los polígonos intersectados por categoría y hasta diez entidades con nombre. La proximidad es en línea recta; el contraste independiente en ArcGIS Pro sigue pendiente.</p>
                   <span class="status-pill"><span class="small-dot" aria-hidden="true"></span> Consulta espacial por intersección</span>
                 </div>
               </article>

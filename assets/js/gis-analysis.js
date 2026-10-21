@@ -28,6 +28,13 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
   const analysisState = document.querySelector("#analysis-state");
   const analysisResult = document.querySelector("#analysis-result");
   const polygonCount = document.querySelector("#polygon-count");
+  const parkCount = document.querySelector("#park-count");
+  const forestCount = document.querySelector("#forest-count");
+  const recreationCount = document.querySelector("#recreation-count");
+  const otherCount = document.querySelector("#other-count");
+  const otherCategoryRow = document.querySelector("#other-category-row");
+  const namedSpacesList = document.querySelector("#named-spaces-list");
+  const listMessage = document.querySelector("#list-message");
   const radioInputs = document.querySelectorAll('input[name="radius"]');
   let selectedPoint = null;
   let currentBuffer = null;
@@ -55,6 +62,72 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
   });
   mapElement.map.add(graphicsLayer);
 
+  function clearResults() {
+    polygonCount.textContent = "Pendiente";
+    for (const count of [parkCount, forestCount, recreationCount, otherCount]) {
+      count.textContent = "Pendiente";
+    }
+    otherCategoryRow.hidden = true;
+    namedSpacesList.replaceChildren();
+    namedSpacesList.hidden = true;
+    listMessage.textContent = "El listado estará disponible tras realizar la consulta.";
+  }
+
+  function showResults(espaciosEncontrados) {
+    let parks = 0;
+    let forests = 0;
+    let recreationGrounds = 0;
+    let otherCategories = 0;
+    const namedSpaces = [];
+
+    for (const feature of espaciosEncontrados) {
+      const attributes = feature.attributes;
+      let category = "Sin clasificar";
+      if (attributes.fclass === "park") {
+        parks += 1;
+        category = "Parque";
+      } else if (attributes.fclass === "forest") {
+        forests += 1;
+        category = "Bosque";
+      } else if (attributes.fclass === "recreation_ground") {
+        recreationGrounds += 1;
+        category = "Zona recreativa";
+      } else {
+        otherCategories += 1;
+      }
+
+      const name = (attributes.name || "").trim();
+      if (name) namedSpaces.push({ name, category });
+    }
+
+    polygonCount.textContent = String(espaciosEncontrados.length);
+    parkCount.textContent = String(parks);
+    forestCount.textContent = String(forests);
+    recreationCount.textContent = String(recreationGrounds);
+    otherCount.textContent = String(otherCategories);
+    otherCategoryRow.hidden = otherCategories === 0;
+
+    // Solo nombres reales; los polígonos sin nombre también cuentan en el total.
+    const visibleSpaces = namedSpaces.slice(0, 10);
+    namedSpacesList.hidden = visibleSpaces.length === 0;
+    for (const space of visibleSpaces) {
+      const item = document.createElement("li");
+      const name = document.createElement("span");
+      const category = document.createElement("span");
+      name.textContent = space.name;
+      category.textContent = space.category;
+      item.append(name, category);
+      namedSpacesList.append(item);
+    }
+    if (espaciosEncontrados.length === 0) {
+      listMessage.textContent = "No se encontraron entidades que intersecten el buffer.";
+    } else if (namedSpaces.length === 0) {
+      listMessage.textContent = "Las entidades encontradas no tienen nombre en los datos de origen.";
+    } else {
+      listMessage.textContent = `Se muestran ${visibleSpaces.length} de ${namedSpaces.length} entidades con nombre. Cada registro corresponde a una entidad poligonal.`;
+    }
+  }
+
   function invalidateAnalysis() {
     // Una respuesta pendiente ya no pertenece al punto o al radio actuales.
     queryVersion += 1;
@@ -62,7 +135,7 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     analyzeButton.disabled = !currentBuffer || !greenSpacesLayer;
     analyzeButton.setAttribute("aria-busy", "false");
     analysisState.textContent = "Sin analizar";
-    polygonCount.textContent = "Pendiente";
+    clearResults();
     if (!greenSpacesLayer) {
       analysisHelp.textContent = "Consulta no disponible: no se ha podido preparar la capa de espacios verdes.";
       analysisResult.textContent = "Puedes seleccionar una ubicación y visualizar su buffer. La consulta requiere la capa de espacios verdes.";
@@ -87,8 +160,21 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     analyzeButton.disabled = true;
     analyzeButton.setAttribute("aria-busy", "true");
     analysisState.textContent = "Consultando";
-    polygonCount.textContent = "Pendiente";
+    clearResults();
     analysisResult.textContent = "Consultando los espacios verdes que intersectan el buffer…";
+
+    // Ampliar una copia de la extensión deja margen sin modificar el buffer.
+    try {
+      await view.goTo(currentBuffer.extent.clone().expand(1.3), {
+        animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      });
+    } catch (error) {
+      // Un gesto o Restablecer mapa pueden interrumpir la navegación normalmente.
+      if (error.name !== "AbortError" && version === queryVersion) {
+        bufferStatus.textContent = "No se ha podido encuadrar el buffer. La consulta sigue disponible.";
+      }
+    }
+    if (version !== queryVersion) return;
 
     try {
       // createQuery() devuelve un objeto Query con la configuración de la capa.
@@ -101,12 +187,15 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
       const resultado = await greenSpacesLayer.queryFeatures(query);
       if (version !== queryVersion) return;
       const espaciosEncontrados = resultado.features;
-      polygonCount.textContent = String(espaciosEncontrados.length);
+      showResults(espaciosEncontrados);
       analysisState.textContent = "Consulta realizada";
+      if (espaciosEncontrados.length === 0) {
+        analysisState.textContent = "Consulta sin resultados";
+      }
       analysisResult.textContent = `${espaciosEncontrados.length} polígonos de espacios verdes encontrados en un radio de ${radiusLabel}.`;
     } catch {
       if (version !== queryVersion) return;
-      analysisState.textContent = "Consulta no completada";
+      analysisState.textContent = "Error de consulta";
       analysisResult.textContent = "No se ha podido consultar la capa. Pulsa Analizar zona para intentarlo de nuevo.";
     } finally {
       // Una consulta antigua tampoco debe cambiar el botón de otra más reciente.

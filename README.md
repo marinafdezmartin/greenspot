@@ -1,6 +1,6 @@
 ﻿# GreenSpot
 
-Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.3: consulta espacial de polígonos que intersectan buffers geodésicos de 500 y 1.000 metros**, sobre el GeoJSON real de OpenStreetMap integrado en B.1. Muestra únicamente el número de entidades poligonales encontradas, no parques independientes. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y el diseño existente.
+Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.4A: encuadre del buffer y resumen de resultados**, sobre la consulta espacial y los buffers geodésicos de 500 y 1.000 metros existentes. Muestra el total de entidades poligonales intersectadas, su recuento por categoría y hasta diez entidades con nombre; no representa parques independientes. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y el diseño general.
 
 ## Arrancar en VS Code
 
@@ -33,7 +33,7 @@ No hay despliegue preparado ni autorizado. Para un futuro hosting estático habr
 | `assets/js/app.js` | Eventos DOM del menú, cierre con Escape, navegación activa y actualización del radio preparado. Importa e inicia el mapa. |
 | `assets/js/map.js` | Importación local protegida con try/catch, carga diferida del CDN, componente arcgis-map, estados, límites de espera y restablecimiento de vista. |
 | `assets/js/map-layers.js` | Importa clases con `$arcgis.import()`, define símbolos, renderer y popup, añade el GeoJSON al mapa existente y devuelve la capa. |
-| `assets/js/gis-analysis.js` | Gestiona selección, buffer geodésico, gráficos y consulta espacial al pulsar Analizar zona. |
+| `assets/js/gis-analysis.js` | Gestiona selección, buffer geodésico, gráficos, encuadre y consulta espacial con resumen de resultados. |
 | `assets/js/config.example.js` | Contrato de configuración sin credenciales. |
 | `assets/data/README.md` | Estado y requisitos para las futuras capas. |
 
@@ -111,7 +111,25 @@ Mientras espera, el botón queda deshabilitado y el mensaje anuncia la consulta.
 
 Referencia: [GeoJSONLayer.createQuery() y queryFeatures(), documentación de Esri](https://developers.arcgis.com/javascript/latest/references/core/layers/GeoJSONLayer/).
 
-Pendientes tras B.3: leyenda propia, resaltado, listados y contraste independiente de resultados en ArcGIS Pro. No se calculan superficies, porcentajes, uniones ni índices. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear datos simulados. La proximidad es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a B.4 sin confirmación.
+### Encuadre y panel de resultados (B.4A)
+
+Solo al pulsar **Analizar zona**, antes de la Query, se ejecuta:
+
+```js
+await view.goTo(currentBuffer.extent.clone().expand(1.3), {
+  animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+});
+```
+
+`extent` es el rectángulo que contiene el buffer; `clone()` crea una copia y `expand(1.3)` amplía esa copia un 30 % alrededor del centro. Se añade margen al encuadre sin alterar la geometría consultada. `goTo()` ajusta la vista al rectángulo. Se conserva el movimiento reducido y se captura `AbortError`, una interrupción normal por navegación o restablecimiento, para continuar la consulta sin mostrar un error. Otros fallos de encuadre tampoco bloquean la Query. Tras esperar el zoom, `queryVersion` impide consultar un punto/radio que haya cambiado durante la navegación. Referencias de Esri: [MapView.goTo()](https://developers.arcgis.com/javascript/latest/references/core/views/MapView/#goTo), [Extent.expand()](https://developers.arcgis.com/javascript/latest/references/core/geometry/Extent/#expand).
+
+La Query de B.3 se mantiene. `showResults(espaciosEncontrados)` recorre sus entidades con `for...of` y cuenta los tres valores de `fclass` mediante `if / else`. El total siempre es la longitud del resultado completo. Las categorías inesperadas se cuentan en una fila adicional «Sin clasificar», visible solo cuando sea necesaria.
+
+En el mismo bucle se lee `(attributes.name || "").trim()`: los nombres vacíos, nulos o solo con espacios no entran en el listado, pero sus entidades permanecen en los recuentos. Se conservan el orden de la consulta y los nombres reales; `slice(0, 10)` limita el listado. No se agrupan nombres repetidos porque son entidades poligonales distintas. Si ninguna tiene nombre, se muestra una explicación. Los elementos se crean mediante `document.createElement()` y `textContent`, sin interpretar HTML de los atributos.
+
+`clearResults()` limpia todos los indicadores y el listado al invalidar o comenzar una consulta. Se mantienen los estados sin analizar, consultando, consulta realizada, consulta sin resultados y error. La lista tiene altura máxima y desplazamiento con teclado para conservar el panel compacto; se mantienen la retícula y los puntos de adaptación existentes.
+
+Pendientes tras B.4A: leyenda propia, resaltado y contraste independiente de resultados en ArcGIS Pro. No se calculan superficies, porcentajes, uniones ni índices. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear datos simulados. La proximidad es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a otra fase sin confirmación.
 
 La maqueta original se conserva como referencia y nunca se publica dentro de la página. En la segunda iteración visual se sustituyen las composiciones botánicas por imágenes locales de `assets/img/gallery/`, con procedencia confirmada por la propietaria. El hero utiliza `madrid.jpg`; las tarjetas, `ciudadania.jpg`, `urbanismo.jpg` y `profesionales-gis.png`; el cierre, `madrid-verde.jpg`. La imagen GIS se identifica como ilustración generada con IA. Véanse dimensiones, licencia declarada y créditos pendientes en [el registro de imágenes](assets/img/gallery/README.md).
 
@@ -124,6 +142,19 @@ En Live Server revisa 360, 768, 1024 y 1440 px: ausencia de desbordamiento horiz
 Sin archivo local debe aparecer el estado pendiente. La importación de un archivo local ausente puede producir un 404 en desarrollo; se captura y no impide ejecutar la interfaz. Con clave vacía tampoco se carga el SDK. Con clave válida comprueba la cartografía real; con permisos incorrectos o red interrumpida, el aviso de error. No compartas capturas de red ni consola con tokens.
 
 ## Verificación realizada
+
+### Fase B.4A
+
+Pruebas con Edge y el SDK 5.1 real, mediante servidor HTTP local en `http://localhost:5500`:
+
+- «Analizar zona» encuadra el buffer completo con 500 m y 1 km. Se verificaron los vértices en coordenadas de pantalla y que la geometría original no cambiara. Seleccionar punto o cambiar radio no ejecuta `goTo()` ni consulta automáticamente.
+- En el punto −3.683, 40.415: 500 m devuelve 1 polígono de parque; 1 km devuelve 25 entidades (24 de parques y 1 de zona recreativa). Se compararon recuentos y nombres con una consulta directa de la capa: coincidieron. El listado muestra los primeros diez registros con nombre; repetir el análisis no duplica elementos.
+- Ubicación real sin nombres, aproximadamente −3.618175, 40.448665: 8 entidades (6 de parques y 2 de bosques), recuentos conservados y mensaje de ausencia de nombres. También se verificó una consulta real sin resultados: todos los recuentos a cero, lista vacía y estado «Consulta sin resultados».
+- Cambio de punto/radio limpia indicadores y lista. Una respuesta antigua, retrasada en la prueba y recibida después de la nueva, no sobrescribe el panel. Interrumpir la animación con «Volver a Madrid» conserva la consulta y el restablecimiento sin aviso de error. Popups y preferencia de movimiento reducido operativos.
+- Panel revisado a 360/768/1024/1440 px, con capturas inspeccionadas en móvil y escritorio. Sin desbordamiento horizontal; lista limitada a diez entradas, con altura máxima de 240 px y desplazamiento. Se mantienen los puntos de adaptación y la distribución existentes.
+- Una única petición del GeoJSON; sin excepciones JavaScript ni errores HTTP en la sesión normal. `map.js`, `map-layers.js`, `app.js`, configuración y GeoJSON no se modifican.
+
+Pendientes: contraste independiente en ArcGIS Pro y comprobación desde la extensión Live Server; se usó un servidor HTTP equivalente. La capa real no contiene categorías inesperadas; la rama «Sin clasificar» se conserva para contabilizarlas si aparecieran. No se implementan superficies, recortes ni otra fase.
 
 ### Fase B.3
 
