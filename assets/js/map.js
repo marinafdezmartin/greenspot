@@ -1,4 +1,5 @@
 import { addGreenSpacesLayer } from "./map-layers.js";
+import { initializeGisAnalysis } from "./gis-analysis.js";
 
 const MADRID = { center: [-3.7038, 40.4168], zoom: 12 };
 const SDK_URL = "https://js.arcgis.com/5.1/";
@@ -52,9 +53,11 @@ export async function initializeMap() {
   let mapElement;
   let failed = false;
   let fatalErrorHandle;
+  let gisAnalysis;
   const showFailure = () => {
     failed = true;
     fatalErrorHandle?.remove();
+    gisAnalysis?.destroy();
     setMapState(
       "error",
       "No se ha podido cargar el mapa",
@@ -161,5 +164,15 @@ export async function initializeMap() {
   } catch {
     greenSpacesStatus.textContent =
       "No se ha podido cargar la capa. El mapa base sigue disponible.";
+  }
+
+  if (failed) return;
+  try {
+    const controls = await initializeGisAnalysis(mapElement);
+    if (failed) controls?.destroy();
+    else gisAnalysis = controls;
+  } catch {
+    document.querySelector("#buffer-status").textContent =
+      "No se ha podido preparar el buffer. Recarga la página. El mapa sigue disponible.";
   }
 }

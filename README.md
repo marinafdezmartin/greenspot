@@ -1,6 +1,6 @@
 ﻿# GreenSpot
 
-Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.1: carga y simbología de un GeoJSON real de OpenStreetMap**, sin análisis espacial. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y la interfaz existente.
+Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.2: selección de ubicación y buffers geodésicos de 500 y 1.000 metros**, sobre el GeoJSON real de OpenStreetMap integrado en B.1. No hay consultas ni resultados de proximidad. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y la interfaz existente.
 
 ## Arrancar en VS Code
 
@@ -33,6 +33,7 @@ No hay despliegue preparado ni autorizado. Para un futuro hosting estático habr
 | `assets/js/app.js` | Eventos DOM del menú, cierre con Escape, navegación activa y actualización del radio preparado. Importa e inicia el mapa. |
 | `assets/js/map.js` | Importación local protegida con try/catch, carga diferida del CDN, componente arcgis-map, estados, límites de espera y restablecimiento de vista. |
 | `assets/js/map-layers.js` | Importa clases con `$arcgis.import()`, define símbolos, renderer y popup, añade el GeoJSON al mapa existente y devuelve la capa. |
+| `assets/js/gis-analysis.js` | Prepara el operador geodésico, gestiona el modo de selección y dibuja punto y buffer en una sola `GraphicsLayer`. |
 | `assets/js/config.example.js` | Contrato de configuración sin credenciales. |
 | `assets/data/README.md` | Estado y requisitos para las futuras capas. |
 
@@ -42,7 +43,7 @@ El mapa comienza en **longitud −3.7038, latitud 40.4168, zoom 12**, como vista
 
 `data-map-state` en `.viewer` expresa `loading`, `unconfigured`, `ready` o `error`. Los mensajes se actualizan con `textContent` y regiones de estado accesibles. El botón de vuelta se habilita tras `viewOnReady()` y `basemap.loadAll()`. Los errores se presentan sin registrar claves ni objetos de error que puedan incluir URLs con tokens.
 
-El radio vive en los controles nativos; `app.js` solo refleja la elección en el panel. No se elige un punto ni se crea geometría. En B.1, `map.js` llama a `addGreenSpacesLayer(mapElement.map)` después de preparar la vista y los controles. La lógica espacial podrá separarse más adelante en `analysis.js`, previa autorización y validación de método métrico y resultados frente a ArcGIS Pro. Ese archivo no se crea en B.1.
+El radio vive en los controles nativos; `app.js` refleja la elección en el panel y `gis-analysis.js` actualiza el buffer. `map.js` conserva la carga de B.1 con `addGreenSpacesLayer(mapElement.map)` y llama después a `initializeGisAnalysis(mapElement)`, con su propio manejo de errores. No se crea otro mapa ni se duplica el SDK. La lógica nueva se concentra en `gis-analysis.js`; no se añade otro archivo `analysis.js`.
 
 ## Carga y simbología del GeoJSON (B.1)
 
@@ -56,15 +57,25 @@ El módulo sigue el orden de los ejercicios de Esri:
 4. Crea la `GeoJSONLayer` con URL local relativa al módulo, renderer y popup. El popup muestra nombre y categoría; nombres vacíos, nulos o solo con espacios se presentan como «Espacio verde sin nombre». Se usa `textContent` para no interpretar HTML de los atributos.
 5. Ejecuta `map.add()` sobre el mapa existente, espera `layer.load()` y devuelve la instancia. El ID estable `espacios-verdes-madrid` permite recuperarla con `map.findLayerById()`; llamadas repetidas reutilizan la misma capa y su carga del SDK.
 
-`osm_id`, `name`, `fclass` y las geometrías se conservan para trabajo posterior. El archivo original no se modifica; no se utiliza `Shape_Area` ni `Shape_Length` para mediciones. No hay consultas espaciales, buffers, cálculos de superficies, selección de puntos ni estadísticas de proximidad.
+`osm_id`, `name`, `fclass` y las geometrías se conservan para trabajo posterior. El archivo original no se modifica; no se utiliza `Shape_Area` ni `Shape_Length` para mediciones. El módulo de capas no incorpora consultas espaciales ni cálculos; los buffers de B.2 viven en un módulo independiente.
 
 `map.js` espera también `view.whenLayerView()` para anunciar «Capa disponible». Los errores de la capa se notifican en el panel existente sin retirar el mapa base ni deshabilitar sus controles. El error general del visor se reserva a la inicialización, el mapa base y errores fatales de vista. La atribución de los datos aparece junto al visor, en el pie y en `GeoJSONLayer.copyright`, conservando las atribuciones de Esri: [© OpenStreetMap contributors (ODbL)](https://www.openstreetmap.org/copyright).
 
 ## Funciones y límites
 
-Disponibles: landing, anclas, menú móvil con teclado/Escape, enlaces a fuentes, selector preparatorio 500 m / 1 km y estados del visor. Con clave válida y acceso al CDN: mapa base real, capa GeoJSON categorizada, popup, zoom, desplazamiento y vuelta a Madrid.
+### Selección y buffer geodésico (B.2)
 
-Pendientes tras B.1: leyenda propia, selección de ubicación, buffers, consultas espaciales, resaltado, recuento y listado de proximidad. «Analizar» está deshabilitado y los resultados son pendientes. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear resultados ficticios. La proximidad prevista es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a B.2 sin confirmación.
+1. Pulsa **Seleccionar ubicación** en el panel. Se activa un cursor de selección y se suspende temporalmente la apertura automática de popups. Puedes cancelar con el mismo botón o con Escape; se conservan los gráficos anteriores.
+2. Pulsa sobre el mapa. Un único controlador `view.on("click", ...)` recibe `event.mapPoint`, la geometría `Point` con su referencia espacial. Se clona y guarda en `selectedPoint`. Fuera del modo de selección ese controlador no modifica la ubicación y los popups siguen funcionando.
+3. Tras importar el operador mediante `$arcgis.import()`, se comprueba `isLoaded()` y, cuando hace falta, se espera `load()`. Solo entonces se habilita la selección. La geometría se crea con `geodesicBufferOperator.execute(selectedPoint, radius, { unit: "meters" })`. El radio solo admite 500 o 1.000; no se miden grados ni se interpreta la anchura proyectada del mapa como una distancia geodésica.
+4. Se comprueba que el resultado sea un polígono con anillos y extensión no vacía. Se crean dos `Graphic`: marcador azul y polígono azul semitransparente. La única `GraphicsLayer`, con ID `analysis-graphics`, dibuja el buffer debajo del marcador y encima de la capa verde. Los gráficos no tienen popup propio.
+5. El evento `change` de los radios llama a `updateBuffer()` sobre el mismo `selectedPoint`. Una nueva ubicación reemplaza ese punto. Antes de dibujar se retiran los gráficos anteriores: siempre hay como máximo un marcador y un buffer. Si falla el cálculo, queda el marcador y un aviso, sin conservar un buffer con radio incorrecto.
+
+Los eventos y la capa se crean una vez por inicialización. `destroy()` elimina controladores, retira la capa y restaura los popups si el visor sufre un fallo fatal. El botón **Volver a Madrid** conserva su función de navegación; no borra la ubicación elegida. El cambio de radio no mueve el mapa.
+
+Disponibles: landing, anclas, menú móvil con teclado/Escape, enlaces a fuentes y estados del visor. Con clave válida y acceso al CDN: mapa base real, capa GeoJSON categorizada, popup, selección explícita de ubicación, radios 500 m / 1 km, buffer geodésico, zoom, desplazamiento y vuelta a Madrid.
+
+Pendientes tras B.2: leyenda propia, consultas espaciales, resaltado, recuento y listado de proximidad. «Analizar» permanece deshabilitado. El buffer es una visualización geométrica, no un resultado sobre los parques: no se ejecutan `Query`, `queryFeatures()`, intersecciones, estadísticas ni cálculos de superficies. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear datos simulados. La proximidad es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a B.3 sin confirmación.
 
 La maqueta original se conserva como referencia y nunca se publica dentro de la página. En la segunda iteración visual se sustituyen las composiciones botánicas por imágenes locales de `assets/img/gallery/`, con procedencia confirmada por la propietaria. El hero utiliza `madrid.jpg`; las tarjetas, `ciudadania.jpg`, `urbanismo.jpg` y `profesionales-gis.png`; el cierre, `madrid-verde.jpg`. La imagen GIS se identifica como ilustración generada con IA. Véanse dimensiones, licencia declarada y créditos pendientes en [el registro de imágenes](assets/img/gallery/README.md).
 
@@ -77,6 +88,14 @@ En Live Server revisa 360, 768, 1024 y 1440 px: ausencia de desbordamiento horiz
 Sin archivo local debe aparecer el estado pendiente. La importación de un archivo local ausente puede producir un 404 en desarrollo; se captura y no impide ejecutar la interfaz. Con clave vacía tampoco se carga el SDK. Con clave válida comprueba la cartografía real; con permisos incorrectos o red interrumpida, el aviso de error. No compartas capturas de red ni consola con tokens.
 
 ## Verificación realizada
+
+### Fase B.2
+
+Comprobación con el SDK 5.1 real en Edge y servidor HTTP local en `http://localhost:5500`, sin modificar ni imprimir la clave. Se probaron clics reales sobre el mapa, creación del marcador y del buffer de 500 m, cambio a 1.000 m sin mover el punto y sustitución por otra ubicación. La anchura del buffer aumentó aproximadamente al doble; una comprobación esférica independiente en el código temporal de prueba situó sus vértices alrededor de 1.000 m. Esta comprobación aproximada no sustituye el contraste geodésico con ArcGIS Pro.
+
+Escape canceló el modo conservando el punto anterior y restaurando los popups. Un clic posterior en un parque abrió su popup sin cambiar la ubicación seleccionada. Zoom, desplazamiento y «Volver a Madrid» siguieron operativos, conservando los gráficos. Se mantuvieron una sola capa de análisis, dos gráficos y una petición del GeoJSON. «Analizar» permaneció deshabilitado. No se observaron excepciones JavaScript ni errores HTTP en esta carga.
+
+Se revisaron 360, 768, 1024 y 1440 px sin desbordamiento horizontal y una captura del buffer azul semitransparente sobre las zonas verdes. El GeoJSON original conserva su hash de B.1. Quedan pendientes el contraste de la geometría con ArcGIS Pro, las pruebas desde la extensión Live Server de VS Code (se usó un servidor HTTP equivalente) y cualquier consulta o resultado, reservados a una fase posterior autorizada.
 
 ### Fase B.1
 
@@ -108,3 +127,4 @@ Límites de la prueba: el navegador del entorno bloqueó el CDN de Bootstrap (`E
 - [UniqueValueRenderer](https://developers.arcgis.com/javascript/latest/references/core/renderers/UniqueValueRenderer/).
 - [SimpleFillSymbol](https://developers.arcgis.com/javascript/latest/references/core/symbols/SimpleFillSymbol/).
 - [PopupTemplate](https://developers.arcgis.com/javascript/latest/references/core/PopupTemplate/).
+- [geodesicBufferOperator: load, isLoaded y execute](https://developers.arcgis.com/javascript/latest/references/core/geometry/operators/geodesicBufferOperator/).
