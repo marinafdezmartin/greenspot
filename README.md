@@ -1,6 +1,6 @@
 ﻿# GreenSpot
 
-Prototipo WebGIS independiente sobre proximidad a parques y jardines de Madrid. FASE A: landing completa e integración del visor, pendiente de configuración local de Esri. No es una herramienta oficial del Ayuntamiento de Madrid. No hay datos GIS propios integrados ni resultados de análisis.
+Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.1: carga y simbología de un GeoJSON real de OpenStreetMap**, sin análisis espacial. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y la interfaz existente.
 
 ## Arrancar en VS Code
 
@@ -32,6 +32,7 @@ No hay despliegue preparado ni autorizado. Para un futuro hosting estático habr
 | `assets/css/style.css` | Tokens, composición editorial con fotografías locales, responsive y movimiento reducido. |
 | `assets/js/app.js` | Eventos DOM del menú, cierre con Escape, navegación activa y actualización del radio preparado. Importa e inicia el mapa. |
 | `assets/js/map.js` | Importación local protegida con try/catch, carga diferida del CDN, componente arcgis-map, estados, límites de espera y restablecimiento de vista. |
+| `assets/js/map-layers.js` | Importa clases con `$arcgis.import()`, define símbolos, renderer y popup, añade el GeoJSON al mapa existente y devuelve la capa. |
 | `assets/js/config.example.js` | Contrato de configuración sin credenciales. |
 | `assets/data/README.md` | Estado y requisitos para las futuras capas. |
 
@@ -41,13 +42,29 @@ El mapa comienza en **longitud −3.7038, latitud 40.4168, zoom 12**, como vista
 
 `data-map-state` en `.viewer` expresa `loading`, `unconfigured`, `ready` o `error`. Los mensajes se actualizan con `textContent` y regiones de estado accesibles. El botón de vuelta se habilita tras `viewOnReady()` y `basemap.loadAll()`. Los errores se presentan sin registrar claves ni objetos de error que puedan incluir URLs con tokens.
 
-El radio vive en los controles nativos; `app.js` solo refleja la elección en el panel. No se elige un punto ni se crea geometría. En fase B se conectarán los GeoJSON de `assets/data/` mediante `GeoJSONLayer` al `mapElement.map` tras disponer de la vista. La lógica espacial podrá separarse entonces en `analysis.js`, verificando campos y geometrías reales, método métrico y resultados frente a ArcGIS Pro. Ese archivo no se crea en fase A.
+El radio vive en los controles nativos; `app.js` solo refleja la elección en el panel. No se elige un punto ni se crea geometría. En B.1, `map.js` llama a `addGreenSpacesLayer(mapElement.map)` después de preparar la vista y los controles. La lógica espacial podrá separarse más adelante en `analysis.js`, previa autorización y validación de método métrico y resultados frente a ArcGIS Pro. Ese archivo no se crea en B.1.
+
+## Carga y simbología del GeoJSON (B.1)
+
+`assets/data/espacios_verdes_madrid.geojson` contiene 2.707 entidades Polygon/MultiPolygon. La procedencia declarada es OpenStreetMap, extracción mediante Geofabrik y preparación en ArcGIS Pro. Véase el [registro de datos](assets/data/README.md).
+
+El módulo sigue el orden de los ejercicios de Esri:
+
+1. Importa `SimpleFillSymbol`, `UniqueValueRenderer`, `GeoJSONLayer` y `PopupTemplate` desde el SDK 5.1 ya cargado, mediante `$arcgis.import()`.
+2. Define tres `SimpleFillSymbol`: verde medio para `park`, verde oscuro para `forest` y salvia claro para `recreation_ground`, con opacidad parcial y contornos de 0,5 puntos.
+3. Crea un `UniqueValueRenderer` cuyo `field` es `fclass`. Cada entrada de `uniqueValueInfos` asocia el valor exacto del dato con su símbolo y una etiqueta en español.
+4. Crea la `GeoJSONLayer` con URL local relativa al módulo, renderer y popup. El popup muestra nombre y categoría; nombres vacíos, nulos o solo con espacios se presentan como «Espacio verde sin nombre». Se usa `textContent` para no interpretar HTML de los atributos.
+5. Ejecuta `map.add()` sobre el mapa existente, espera `layer.load()` y devuelve la instancia. El ID estable `espacios-verdes-madrid` permite recuperarla con `map.findLayerById()`; llamadas repetidas reutilizan la misma capa y su carga del SDK.
+
+`osm_id`, `name`, `fclass` y las geometrías se conservan para trabajo posterior. El archivo original no se modifica; no se utiliza `Shape_Area` ni `Shape_Length` para mediciones. No hay consultas espaciales, buffers, cálculos de superficies, selección de puntos ni estadísticas de proximidad.
+
+`map.js` espera también `view.whenLayerView()` para anunciar «Capa disponible». Los errores de la capa se notifican en el panel existente sin retirar el mapa base ni deshabilitar sus controles. El error general del visor se reserva a la inicialización, el mapa base y errores fatales de vista. La atribución de los datos aparece junto al visor, en el pie y en `GeoJSONLayer.copyright`, conservando las atribuciones de Esri: [© OpenStreetMap contributors (ODbL)](https://www.openstreetmap.org/copyright).
 
 ## Funciones y límites
 
-Disponibles: landing, anclas, menú móvil con teclado/Escape, enlaces a fuentes, selector preparatorio 500 m / 1 km y estados del visor. Con clave válida: mapa base real, zoom, desplazamiento y vuelta a Madrid.
+Disponibles: landing, anclas, menú móvil con teclado/Escape, enlaces a fuentes, selector preparatorio 500 m / 1 km y estados del visor. Con clave válida y acceso al CDN: mapa base real, capa GeoJSON categorizada, popup, zoom, desplazamiento y vuelta a Madrid.
 
-Pendientes de fase B: capas de parques/jardines, leyenda propia, selección de ubicación, buffers, identificación por geometrías reales, resaltado, recuento y listado. «Analizar» está deshabilitado y los resultados son pendientes. No se han descargado datos ni creado resultados ficticios. La proximidad prevista es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal.
+Pendientes tras B.1: leyenda propia, selección de ubicación, buffers, consultas espaciales, resaltado, recuento y listado de proximidad. «Analizar» está deshabilitado y los resultados son pendientes. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear resultados ficticios. La proximidad prevista es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a B.2 sin confirmación.
 
 La maqueta original se conserva como referencia y nunca se publica dentro de la página. En la segunda iteración visual se sustituyen las composiciones botánicas por imágenes locales de `assets/img/gallery/`, con procedencia confirmada por la propietaria. El hero utiliza `madrid.jpg`; las tarjetas, `ciudadania.jpg`, `urbanismo.jpg` y `profesionales-gis.png`; el cierre, `madrid-verde.jpg`. La imagen GIS se identifica como ilustración generada con IA. Véanse dimensiones, licencia declarada y créditos pendientes en [el registro de imágenes](assets/img/gallery/README.md).
 
@@ -60,6 +77,18 @@ En Live Server revisa 360, 768, 1024 y 1440 px: ausencia de desbordamiento horiz
 Sin archivo local debe aparecer el estado pendiente. La importación de un archivo local ausente puede producir un 404 en desarrollo; se captura y no impide ejecutar la interfaz. Con clave vacía tampoco se carga el SDK. Con clave válida comprueba la cartografía real; con permisos incorrectos o red interrumpida, el aviso de error. No compartas capturas de red ni consola con tokens.
 
 ## Verificación realizada
+
+### Fase B.1
+
+Se inspeccionó el GeoJSON local: 2.707 entidades poligonales, campos requeridos presentes y las tres categorías esperadas; su hash confirma que el original no se modificó. Se verificaron la carga real de la capa y su vista mediante el SDK 5.1, los tres símbolos, los campos conservados, los casos de popup con nombre nulo/vacío/espacios y la inserción segura de nombres como texto.
+
+La prueba en Edge se hizo con un servidor HTTP local en `http://localhost:5500`, equivalente al origen habitual de Live Server, y la configuración local existente, sin imprimir credenciales. El mapa base y el GeoJSON cargaron sin fallos HTTP ni excepciones JavaScript en la carga normal. Zoom, desplazamiento y «Volver a Madrid» funcionaron. Dos llamadas adicionales al módulo reutilizaron la instancia: una sola capa operativa y una sola petición del GeoJSON durante esa carga de página.
+
+Se revisó una captura del visor con los polígonos situados sobre Madrid y las atribuciones visibles. Una pulsación real sobre un polígono abrió el popup de la capa, con nombre y categoría correctos. Una segunda carga de prueba interceptó exclusivamente la petición local del GeoJSON y respondió con HTTP 404: se mostró el aviso de capa, se mantuvo una sola instancia de `arcgis-map` y el mapa base continuó operativo, incluido «Volver a Madrid». El original no se modificó para realizar esta prueba.
+
+El origen de prueba inicial `127.0.0.1:8765` obtuvo HTTP 401 del mapa base; no se modificó la clave ni sus restricciones. `localhost:5500` funcionó. La prueba no se realizó con la extensión Live Server de VS Code, sino con un servidor HTTP local. Quedan pendientes la validación independiente de la preparación/exportación en ArcGIS Pro, la revisión de cobertura de los datos y las pruebas de análisis, fuera del alcance B.1.
+
+### Entregas visuales anteriores
 
 Verificación de esta entrega: HTML con etiquetas equilibradas, identificadores únicos, anclas y referencias ARIA correctas; recursos locales accesibles por HTTP; exclusión de configuración local verificada con Git. En Edge sin interfaz se probaron 360/768/1024/1440 px sin desbordamiento horizontal, cambio de radio con flechas de teclado, menú móvil con barra espaciadora, Escape, foco de navegación y movimiento reducido. No se observaron excepciones JavaScript. Se revisaron capturas de escritorio y móvil.
 
@@ -74,4 +103,8 @@ Límites de la prueba: el navegador del entorno bloqueó el CDN de Bootstrap (`E
 - [Ejemplo oficial de mapa 2D](https://developers.arcgis.com/javascript/latest/sample-code/intro-map-components/).
 - [Ciclo de vida y viewOnReady](https://developers.arcgis.com/javascript/latest/watch-for-changes/).
 - [Autenticación y API keys](https://developers.arcgis.com/javascript/latest/authentication/access-tokens/).
-- [Fuente de datos prevista](https://datos.madrid.es/).
+- [Fuente y atribución de los datos actuales: OpenStreetMap](https://www.openstreetmap.org/copyright).
+- [GeoJSONLayer](https://developers.arcgis.com/javascript/latest/references/core/layers/GeoJSONLayer/).
+- [UniqueValueRenderer](https://developers.arcgis.com/javascript/latest/references/core/renderers/UniqueValueRenderer/).
+- [SimpleFillSymbol](https://developers.arcgis.com/javascript/latest/references/core/symbols/SimpleFillSymbol/).
+- [PopupTemplate](https://developers.arcgis.com/javascript/latest/references/core/PopupTemplate/).

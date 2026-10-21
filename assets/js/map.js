@@ -1,3 +1,5 @@
+import { addGreenSpacesLayer } from "./map-layers.js";
+
 const MADRID = { center: [-3.7038, 40.4168], zoom: 12 };
 const SDK_URL = "https://js.arcgis.com/5.1/";
 const canvas = document.querySelector("#map-canvas");
@@ -6,6 +8,7 @@ const title = document.querySelector("#map-state-title");
 const description = document.querySelector("#map-state-description");
 const status = document.querySelector("#map-status");
 const resetButton = document.querySelector("#reset-map");
+const greenSpacesStatus = document.querySelector("#green-spaces-status");
 
 function setMapState(state, heading, detail) {
   document.querySelector(".viewer").dataset.mapState = state;
@@ -101,7 +104,19 @@ export async function initializeMap() {
       30000,
     );
     if (failed) return;
-    mapElement.view.on("layerview-create-error", showFailure);
+    mapElement.removeEventListener("arcgisViewReadyError", showFailure);
+    mapElement.view.on("layerview-create-error", (event) => {
+      // Solo un fallo del mapa base debe activar el error general del visor.
+      if (
+        basemap.baseLayers.includes(event.layer) ||
+        basemap.referenceLayers.includes(event.layer)
+      ) {
+        showFailure();
+      } else if (event.layer.id === "espacios-verdes-madrid") {
+        greenSpacesStatus.textContent =
+          "No se ha podido representar la capa. El mapa base sigue disponible.";
+      }
+    });
     fatalErrorHandle = reactiveUtils.watch(
       () => mapElement.view?.fatalError,
       (error) => {
@@ -133,5 +148,18 @@ export async function initializeMap() {
   } catch {
     // Never print SDK errors: request URLs can contain the browser API key.
     showFailure();
+    return;
+  }
+
+  // La carga de datos tiene su propio error y no bloquea los controles del mapa.
+  if (failed) return;
+  greenSpacesStatus.textContent = "Cargando espacios verdes…";
+  try {
+    const greenSpacesLayer = await addGreenSpacesLayer(mapElement.map);
+    await mapElement.view.whenLayerView(greenSpacesLayer);
+    if (!failed) greenSpacesStatus.textContent = "Capa disponible";
+  } catch {
+    greenSpacesStatus.textContent =
+      "No se ha podido cargar la capa. El mapa base sigue disponible.";
   }
 }
