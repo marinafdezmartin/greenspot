@@ -17,11 +17,12 @@ menuToggle.addEventListener("click", () => {
 });
 document.addEventListener("click", (event) => {
   const link = event.target.closest('a[href^="#"]');
-  if (!link || !document.querySelector(link.hash)) return;
+  if (!link) return;
+  const target = document.querySelector(link.hash);
+  if (!target) return;
   closeMenu();
-  // Move focus away from an anchor hidden by the mobile menu.
+  // El foco debe salir del enlace que se oculta al cerrar el menú móvil.
   if (mobileLayout.matches && navigation.contains(link)) {
-    const target = document.querySelector(link.hash);
     target.setAttribute("tabindex", "-1");
     target.focus({ preventScroll: true });
   }
@@ -40,16 +41,25 @@ if ("IntersectionObserver" in window) {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       for (const link of navigationLinks) {
-        if (link.hash === `#${entry.target.id}`) link.setAttribute("aria-current", "location");
-        else link.removeAttribute("aria-current");
+        if (link.hash === `#${entry.target.id}`) {
+          link.setAttribute("aria-current", "location");
+        } else {
+          link.removeAttribute("aria-current");
+        }
       }
     }
   }, { rootMargin: "-15% 0px -50% 0px", threshold: 0 });
-  navigationLinks.forEach((link) => observer.observe(document.querySelector(link.hash)));
+  for (const link of navigationLinks) {
+    observer.observe(document.querySelector(link.hash));
+  }
 }
-document.querySelectorAll('input[name="radius"]').forEach((radio) => {
+for (const radio of document.querySelectorAll('input[name="radius"]')) {
   radio.addEventListener("change", () => {
-    document.querySelector("#selected-radius").textContent = radio.value === "1000" ? "1 km" : "500 m";
+    if (radio.value === "1000") {
+      document.querySelector("#selected-radius").textContent = "1 km";
+    } else {
+      document.querySelector("#selected-radius").textContent = "500 m";
+    }
   });
-});
+}
 initializeMap();

@@ -45,6 +45,18 @@ El mapa comienza en **longitud −3.7038, latitud 40.4168, zoom 12**, como vista
 
 El radio vive en los controles nativos; `app.js` refleja la elección en el panel y `gis-analysis.js` actualiza el buffer. `map.js` conserva la carga de B.1 con `addGreenSpacesLayer(mapElement.map)` y llama después a `initializeGisAnalysis(mapElement)`, con su propio manejo de errores. No se crea otro mapa ni se duplica el SDK. La lógica nueva se concentra en `gis-analysis.js`; no se añade otro archivo `analysis.js`.
 
+## Cómo estudiar el código
+
+El recorrido de la aplicación es `app.js → map.js → map-layers.js → gis-analysis.js`. No existe `main.js`: `app.js` ya inicia la aplicación y gestiona navegación, menú móvil y texto del radio. `script.js` está vacío y se conserva sin usar. `config.example.js` sigue siendo una plantilla sencilla; la configuración privada no se modifica.
+
+- En `map.js`, lee primero `initializeMap()`: configura Esri, crea el componente, espera la vista, conecta el botón de restablecimiento y llama a los otros dos módulos. `setMapState()` reúne los cambios de la interfaz. Se sustituyeron las esperas genéricas con `Promise.race()` por un único temporizador de inicialización de 30 segundos, que se cancela cuando el mapa está preparado. `mapStarted` evita iniciar otro visor en la misma página.
+- En `map-layers.js`, sigue los comentarios numerados: importaciones, símbolos, renderer, capa, popup y `map.add()`. `createPopupContent()` solo construye el contenido de la ficha. Se usan nodos de texto para no interpretar como HTML los nombres de OpenStreetMap.
+- En `gis-analysis.js`, sigue `setSelectionMode() → handleMapClick() → updateBuffer()`. El estado necesario es el punto elegido, si se está seleccionando y los valores de popup/cursor que hay que restaurar. `cancelSelection()` reúne la cancelación del botón y de Escape. Las condiciones se escriben con `if / else`, sin ternarios anidados.
+
+Las comprobaciones del buffer se apoyan en el contrato del SDK: tras esperar `load()`, `execute()` devuelve un `Polygon` o un valor vacío. Se comprueba ese resultado, sin volver a validar su tipo, anillos y extensión en cada cambio. Los dos radios proceden de los controles existentes. Se conserva `try / catch` para mostrar un aviso si falla el operador.
+
+Se mantienen por necesidad técnica la carga asíncrona, el identificador estable de cada capa, la restauración de popups, `destroy()` para retirar eventos y gráficos, y `reactiveUtils.watch()` para detectar un fallo fatal de la vista. `IntersectionObserver` conserva el enlace activo de navegación. Los errores del GeoJSON y del operador se gestionan por separado para que no inutilicen el mapa base. No se modifican el algoritmo geodésico, las unidades, los símbolos ni el diseño.
+
 ## Carga y simbología del GeoJSON (B.1)
 
 `assets/data/espacios_verdes_madrid.geojson` contiene 2.707 entidades Polygon/MultiPolygon. La procedencia declarada es OpenStreetMap, extracción mediante Geofabrik y preparación en ArcGIS Pro. Véase el [registro de datos](assets/data/README.md).
@@ -54,8 +66,9 @@ El módulo sigue el orden de los ejercicios de Esri:
 1. Importa `SimpleFillSymbol`, `UniqueValueRenderer`, `GeoJSONLayer` y `PopupTemplate` desde el SDK 5.1 ya cargado, mediante `$arcgis.import()`.
 2. Define tres `SimpleFillSymbol`: verde medio para `park`, verde oscuro para `forest` y salvia claro para `recreation_ground`, con opacidad parcial y contornos de 0,5 puntos.
 3. Crea un `UniqueValueRenderer` cuyo `field` es `fclass`. Cada entrada de `uniqueValueInfos` asocia el valor exacto del dato con su símbolo y una etiqueta en español.
-4. Crea la `GeoJSONLayer` con URL local relativa al módulo, renderer y popup. El popup muestra nombre y categoría; nombres vacíos, nulos o solo con espacios se presentan como «Espacio verde sin nombre». Se usa `textContent` para no interpretar HTML de los atributos.
-5. Ejecuta `map.add()` sobre el mapa existente, espera `layer.load()` y devuelve la instancia. El ID estable `espacios-verdes-madrid` permite recuperarla con `map.findLayerById()`; llamadas repetidas reutilizan la misma capa y su carga del SDK.
+4. Crea la `GeoJSONLayer` con URL local relativa al módulo y renderer.
+5. Configura su `PopupTemplate` mediante `createPopupContent()`. El popup muestra nombre y categoría; nombres vacíos, nulos o solo con espacios se presentan como «Espacio verde sin nombre». Se usa `textContent` para no interpretar HTML de los atributos.
+6. Ejecuta `map.add()` sobre el mapa existente, espera `layer.load()` y devuelve la instancia. El ID estable `espacios-verdes-madrid` permite recuperarla con `map.findLayerById()`; llamadas repetidas reutilizan la misma capa y su carga del SDK.
 
 `osm_id`, `name`, `fclass` y las geometrías se conservan para trabajo posterior. El archivo original no se modifica; no se utiliza `Shape_Area` ni `Shape_Length` para mediciones. El módulo de capas no incorpora consultas espaciales ni cálculos; los buffers de B.2 viven en un módulo independiente.
 
@@ -68,7 +81,7 @@ El módulo sigue el orden de los ejercicios de Esri:
 1. Pulsa **Seleccionar ubicación** en el panel. Se activa un cursor de selección y se suspende temporalmente la apertura automática de popups. Puedes cancelar con el mismo botón o con Escape; se conservan los gráficos anteriores.
 2. Pulsa sobre el mapa. Un único controlador `view.on("click", ...)` recibe `event.mapPoint`, la geometría `Point` con su referencia espacial. Se clona y guarda en `selectedPoint`. Fuera del modo de selección ese controlador no modifica la ubicación y los popups siguen funcionando.
 3. Tras importar el operador mediante `$arcgis.import()`, se comprueba `isLoaded()` y, cuando hace falta, se espera `load()`. Solo entonces se habilita la selección. La geometría se crea con `geodesicBufferOperator.execute(selectedPoint, radius, { unit: "meters" })`. El radio solo admite 500 o 1.000; no se miden grados ni se interpreta la anchura proyectada del mapa como una distancia geodésica.
-4. Se comprueba que el resultado sea un polígono con anillos y extensión no vacía. Se crean dos `Graphic`: marcador azul y polígono azul semitransparente. La única `GraphicsLayer`, con ID `analysis-graphics`, dibuja el buffer debajo del marcador y encima de la capa verde. Los gráficos no tienen popup propio.
+4. Se comprueba que el operador devuelva una geometría. Se crean dos `Graphic`: marcador azul y polígono azul semitransparente. La única `GraphicsLayer`, con ID `analysis-graphics`, dibuja el buffer debajo del marcador y encima de la capa verde. Los gráficos no tienen popup propio.
 5. El evento `change` de los radios llama a `updateBuffer()` sobre el mismo `selectedPoint`. Una nueva ubicación reemplaza ese punto. Antes de dibujar se retiran los gráficos anteriores: siempre hay como máximo un marcador y un buffer. Si falla el cálculo, queda el marcador y un aviso, sin conservar un buffer con radio incorrecto.
 
 Los eventos y la capa se crean una vez por inicialización. `destroy()` elimina controladores, retira la capa y restaura los popups si el visor sufre un fallo fatal. El botón **Volver a Madrid** conserva su función de navegación; no borra la ubicación elegida. El cambio de radio no mueve el mapa.
@@ -88,6 +101,14 @@ En Live Server revisa 360, 768, 1024 y 1440 px: ausencia de desbordamiento horiz
 Sin archivo local debe aparecer el estado pendiente. La importación de un archivo local ausente puede producir un 404 en desarrollo; se captura y no impide ejecutar la interfaz. Con clave vacía tampoco se carga el SDK. Con clave válida comprueba la cartografía real; con permisos incorrectos o red interrumpida, el aviso de error. No compartas capturas de red ni consola con tokens.
 
 ## Verificación realizada
+
+### Refactorización previa a B.3
+
+Pruebas con el SDK real y servidor HTTP en `localhost:5500`: mapa base, GeoJSON y categorías, popup real, nombres vacíos, ambos radios, nueva ubicación, Escape y restablecimiento. Los puntos y las dimensiones de los buffers coinciden con los registrados antes de simplificar el código. La carga normal no produjo errores HTTP ni excepciones JavaScript; hubo una sola petición del GeoJSON.
+
+Las llamadas repetidas a los módulos mantuvieron un mapa, dos capas operativas (datos y gráficos) y dos gráficos. Un error fatal provocado retiró el mapa, destruyó la capa de análisis y deshabilitó la selección; cambiar el radio después no produjo excepciones. Se comprobaron menú móvil, cancelación por botón, Escape, anclas y texto del radio. La interceptación de peticiones en el navegador comprobó configuración no disponible (404), GeoJSON no disponible (el mapa base sigue operativo) y SDK bloqueado (aviso general), sin modificar archivos privados.
+
+Se comprobaron 360/768/1024/1440 px sin desbordamiento horizontal. Los hashes previos y posteriores verifican que HTML, CSS, GeoJSON y plantilla de configuración permanecen idénticos. La validación independiente en ArcGIS Pro y las pruebas desde la extensión Live Server siguen pendientes; se usó un servidor HTTP equivalente. No se implementó B.3.
 
 ### Fase B.2
 

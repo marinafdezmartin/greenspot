@@ -14,10 +14,10 @@ export async function initializeGisAnalysis(mapElement) {
   ]);
 
   // Preparar el operador una sola vez, antes de habilitar la selección.
-  if (!geodesicBufferOperator.isLoaded()) await geodesicBufferOperator.load();
-  if (!geodesicBufferOperator.isLoaded())
-    throw new Error("Operador no disponible");
-  if (!mapElement.isConnected || !mapElement.view.ready) return;
+  if (!geodesicBufferOperator.isLoaded()) {
+    await geodesicBufferOperator.load();
+  }
+  if (!mapElement.isConnected) return;
   if (mapElement.map.findLayerById("analysis-graphics")) return;
 
   const view = mapElement.view;
@@ -29,7 +29,7 @@ export async function initializeGisAnalysis(mapElement) {
   let previousPopupEnabled = view.popupEnabled;
   let previousCursor = view.container.style.cursor;
 
-  // simbologias
+  // Símbolos del punto y del buffer.
   const pointSymbol = new SimpleMarkerSymbol({
     color: [39, 109, 168, 1],
     size: 11,
@@ -40,7 +40,7 @@ export async function initializeGisAnalysis(mapElement) {
     outline: { color: [39, 109, 168, 0.9], width: 1 },
   });
 
-  // capa grafica <- pointGraphic del buffer. se crea primero
+  // Una sola capa para todos los cambios de ubicación y radio.
   const graphicsLayer = new GraphicsLayer({
     id: "analysis-graphics",
     title: "Ubicación seleccionada y buffer geodésico",
@@ -51,13 +51,8 @@ export async function initializeGisAnalysis(mapElement) {
     if (enabled === selectingLocation) return;
     selectingLocation = enabled;
     selectButton.setAttribute("aria-pressed", String(enabled));
-    selectButton.textContent = enabled
-      ? "Cancelar selección"
-      : selectedPoint
-        ? "Cambiar ubicación"
-        : "Seleccionar ubicación";
-
     if (enabled) {
+      selectButton.textContent = "Cancelar selección";
       previousPopupEnabled = view.popupEnabled;
       previousCursor = view.container.style.cursor;
       view.popupEnabled = false;
@@ -66,6 +61,11 @@ export async function initializeGisAnalysis(mapElement) {
       bufferStatus.textContent =
         "Pulsa sobre el mapa para elegir una ubicación. Escape cancela.";
     } else {
+      if (selectedPoint) {
+        selectButton.textContent = "Cambiar ubicación";
+      } else {
+        selectButton.textContent = "Seleccionar ubicación";
+      }
       view.popupEnabled = previousPopupEnabled;
       view.container.style.cursor = previousCursor;
     }
@@ -85,24 +85,13 @@ export async function initializeGisAnalysis(mapElement) {
     graphicsLayer.removeAll();
     graphicsLayer.add(pointGraphic);
     try {
-      if (![500, 1000].includes(radius) || !geodesicBufferOperator.isLoaded()) {
-        throw new Error("Radio u operador no disponible");
-      }
       const bufferGeometry = geodesicBufferOperator.execute(
         selectedPoint,
         radius,
-        {
-          unit: "meters",
-        },
+        { unit: "meters" },
       );
-      if (
-        !bufferGeometry ||
-        bufferGeometry.type !== "polygon" ||
-        !bufferGeometry.rings.length ||
-        !bufferGeometry.extent ||
-        !(bufferGeometry.extent.width > 0) ||
-        !(bufferGeometry.extent.height > 0)
-      ) {
+      // El operador devuelve un Polygon o un valor vacío si no puede generarlo.
+      if (!bufferGeometry) {
         throw new Error("Buffer no válido");
       }
 
@@ -112,7 +101,12 @@ export async function initializeGisAnalysis(mapElement) {
       });
       // Dibujar el buffer debajo del marcador, sin ocultar los espacios verdes.
       graphicsLayer.add(bufferGraphic, 0);
-      bufferStatus.textContent = `Ubicación seleccionada. Buffer de ${radius === 1000 ? "1.000" : "500"} m. Sin resultados de proximidad.${selectingLocation ? " Pulsa en el mapa para cambiar la ubicación; Escape cancela." : ""}`;
+      let radiusLabel = "500";
+      if (radius === 1000) radiusLabel = "1.000";
+      bufferStatus.textContent = `Ubicación seleccionada. Buffer de ${radiusLabel} m. Sin resultados de proximidad.`;
+      if (selectingLocation) {
+        bufferStatus.textContent += " Pulsa en el mapa para cambiar la ubicación; Escape cancela.";
+      }
     } catch {
       bufferStatus.textContent =
         "No se ha podido dibujar el buffer. Cambia el radio o selecciona otra ubicación.";
@@ -129,27 +123,31 @@ export async function initializeGisAnalysis(mapElement) {
   }
 
   function handleSelectionButton() {
-    const wasSelecting = selectingLocation;
-    setSelectionMode(!wasSelecting);
-    if (wasSelecting)
-      bufferStatus.textContent =
-        "Selección cancelada. Se conserva la ubicación anterior, si existe.";
+    if (selectingLocation) {
+      cancelSelection();
+    } else {
+      setSelectionMode(true);
+    }
+  }
+
+  function cancelSelection() {
+    setSelectionMode(false);
+    bufferStatus.textContent =
+      "Selección cancelada. Se conserva la ubicación anterior, si existe.";
   }
 
   function handleEscape(event) {
     if (event.key !== "Escape" || !selectingLocation) return;
-    setSelectionMode(false);
-    bufferStatus.textContent =
-      "Selección cancelada. Se conserva la ubicación anterior, si existe.";
+    cancelSelection();
     selectButton.focus();
   }
 
   // Los controladores se registran una vez; las interacciones solo cambian el estado.
   const clickHandle = view.on("click", handleMapClick);
   selectButton.addEventListener("click", handleSelectionButton);
-  radioInputs.forEach((input) =>
-    input.addEventListener("change", updateBuffer),
-  );
+  for (const input of radioInputs) {
+    input.addEventListener("change", updateBuffer);
+  }
   document.addEventListener("keydown", handleEscape);
   selectButton.disabled = false;
   bufferStatus.textContent =
@@ -160,9 +158,9 @@ export async function initializeGisAnalysis(mapElement) {
       setSelectionMode(false);
       clickHandle.remove();
       selectButton.removeEventListener("click", handleSelectionButton);
-      radioInputs.forEach((input) =>
-        input.removeEventListener("change", updateBuffer),
-      );
+      for (const input of radioInputs) {
+        input.removeEventListener("change", updateBuffer);
+      }
       document.removeEventListener("keydown", handleEscape);
       selectButton.disabled = true;
       mapElement.map.remove(graphicsLayer);

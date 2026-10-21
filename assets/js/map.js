@@ -10,6 +10,7 @@ const description = document.querySelector("#map-state-description");
 const status = document.querySelector("#map-status");
 const resetButton = document.querySelector("#reset-map");
 const greenSpacesStatus = document.querySelector("#green-spaces-status");
+let mapStarted = false;
 
 function setMapState(state, heading, detail) {
   document.querySelector(".viewer").dataset.mapState = state;
@@ -17,20 +18,18 @@ function setMapState(state, heading, detail) {
   message.hidden = state === "ready";
   title.textContent = heading;
   description.textContent = detail;
-  status.textContent =
-    state === "ready" ? "Mapa base de Esri · Madrid" : heading;
+  if (state === "ready") {
+    status.textContent = "Mapa base de Esri · Madrid";
+  } else {
+    status.textContent = heading;
+  }
   resetButton.disabled = state !== "ready";
 }
-function withTimeout(promise, milliseconds) {
-  let timer;
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => {
-      timer = setTimeout(() => reject(new Error("map-timeout")), milliseconds);
-    }),
-  ]).finally(() => clearTimeout(timer));
-}
 export async function initializeMap() {
+  // app.js inicia un único visor, aunque se vuelva a llamar a esta función.
+  if (mapStarted) return;
+  mapStarted = true;
+
   let config;
   try {
     config = (await import("./config.local.js")).default;
@@ -54,36 +53,58 @@ export async function initializeMap() {
   let failed = false;
   let fatalErrorHandle;
   let gisAnalysis;
-  const showFailure = () => {
+  let initializationTimeout;
+
+  function showFailure() {
+    if (failed) return;
     failed = true;
+    clearTimeout(initializationTimeout);
     fatalErrorHandle?.remove();
     gisAnalysis?.destroy();
+    resetButton.removeEventListener("click", resetMap);
     setMapState(
       "error",
       "No se ha podido cargar el mapa",
       "Comprueba tu conexión, la vigencia de la clave y sus permisos para el mapa base y el dominio local. Después, recarga la página.",
     );
-    // Release the WebGL view and stop requests after a failed initialization.
+    // Al retirar el componente se liberan la vista y sus eventos GIS.
     mapElement?.remove();
-  };
+  }
+
+  async function resetMap() {
+    resetButton.disabled = true;
+    try {
+      await mapElement.view.goTo(MADRID, {
+        animate: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      });
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        status.textContent = "No se ha podido volver a Madrid. Inténtalo de nuevo.";
+      }
+    } finally {
+      if (!failed) resetButton.disabled = false;
+    }
+  }
   setMapState(
     "loading",
     "Cargando el mapa de Madrid",
     "Conectando con el mapa base de Esri. Puede tardar unos segundos.",
   );
+  // Un solo límite para toda la inicialización, en lugar de envolver cada espera.
+  initializationTimeout = setTimeout(showFailure, 30000);
   try {
-    await withTimeout(import(SDK_URL), 25000);
-    const [esriConfig, Map, Basemap, reactiveUtils] = await withTimeout(
-      window.$arcgis.import([
+    await import(SDK_URL);
+    const [esriConfig, Map, Basemap, reactiveUtils] =
+      await $arcgis.import([
         "@arcgis/core/config.js",
         "@arcgis/core/Map.js",
         "@arcgis/core/Basemap.js",
         "@arcgis/core/core/reactiveUtils.js",
-      ]),
-      25000,
-    );
+      ]);
+    if (failed) return;
     esriConfig.apiKey = config.apiKey.trim();
-    await withTimeout(customElements.whenDefined("arcgis-map"), 25000);
+    await customElements.whenDefined("arcgis-map");
+    if (failed) return;
     const basemap = new Basemap({
       style: { id: config.basemapStyle || "arcgis/light-gray", language: "es" },
     });
@@ -98,16 +119,11 @@ export async function initializeMap() {
     const zoomControl = document.createElement("arcgis-zoom");
     zoomControl.setAttribute("slot", "top-left");
     mapElement.append(zoomControl);
-    mapElement.addEventListener("arcgisViewReadyError", showFailure, {
-      once: true,
-    });
     canvas.prepend(mapElement);
-    await withTimeout(
-      Promise.all([mapElement.viewOnReady(), basemap.loadAll()]),
-      30000,
-    );
+    await mapElement.viewOnReady();
+    await basemap.loadAll();
     if (failed) return;
-    mapElement.removeEventListener("arcgisViewReadyError", showFailure);
+    clearTimeout(initializationTimeout);
     mapElement.view.on("layerview-create-error", (event) => {
       // Solo un fallo del mapa base debe activar el error general del visor.
       if (
@@ -133,29 +149,14 @@ export async function initializeMap() {
       "Mapa disponible",
       "Explora Madrid con zoom y desplazamiento.",
     );
-    resetButton.addEventListener("click", async () => {
-      resetButton.disabled = true;
-      try {
-        await mapElement.view.goTo(MADRID, {
-          animate: !window.matchMedia("(prefers-reduced-motion: reduce)")
-            .matches,
-        });
-      } catch (error) {
-        if (error.name !== "AbortError")
-          status.textContent =
-            "No se ha podido volver a Madrid. Inténtalo de nuevo.";
-      } finally {
-        if (!failed) resetButton.disabled = false;
-      }
-    });
+    resetButton.addEventListener("click", resetMap);
   } catch {
-    // Never print SDK errors: request URLs can contain the browser API key.
+    // No registrar errores del SDK: sus URLs pueden contener la API key.
     showFailure();
     return;
   }
 
   // La carga de datos tiene su propio error y no bloquea los controles del mapa.
-  if (failed) return;
   greenSpacesStatus.textContent = "Cargando espacios verdes…";
   try {
     const greenSpacesLayer = await addGreenSpacesLayer(mapElement.map);
@@ -169,8 +170,11 @@ export async function initializeMap() {
   if (failed) return;
   try {
     const controls = await initializeGisAnalysis(mapElement);
-    if (failed) controls?.destroy();
-    else gisAnalysis = controls;
+    if (failed) {
+      controls?.destroy();
+    } else {
+      gisAnalysis = controls;
+    }
   } catch {
     document.querySelector("#buffer-status").textContent =
       "No se ha podido preparar el buffer. Recarga la página. El mapa sigue disponible.";

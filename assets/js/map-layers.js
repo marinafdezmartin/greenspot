@@ -15,7 +15,7 @@ export async function addGreenSpacesLayer(map) {
     return existingLayer;
   }
 
-  // 2. Simbologia
+  // 2. Crear los símbolos de las tres categorías.
   const parkSymbol = new SimpleFillSymbol({
     color: [83, 145, 91, 0.65],
     outline: { color: [36, 79, 54, 0.75], width: 0.5 },
@@ -29,7 +29,7 @@ export async function addGreenSpacesLayer(map) {
     outline: { color: [96, 128, 94, 0.8], width: 0.5 },
   });
 
-  // 3. Unique value rendererr
+  // 3. Asignar un símbolo a cada valor de fclass.
   const greenSpacesRenderer = new UniqueValueRenderer({
     field: "fclass",
     uniqueValueInfos: [
@@ -43,34 +43,7 @@ export async function addGreenSpacesLayer(map) {
     ],
   });
 
-  const categoryLabels = {
-    park: "Parque",
-    forest: "Bosque",
-    recreation_ground: "Zona recreativa",
-  };
-
-  // 4. popup
-  const greenSpacesPopup = new PopupTemplate({
-    title: "Espacio verde de Madrid",
-    outFields: ["osm_id", "name", "fclass"],
-    returnGeometry: true,
-    content: (feature) => {
-      const attributes = feature.graphic.attributes;
-      const name = attributes.name?.trim() || "Espacio verde sin nombre";
-      const category = categoryLabels[attributes.fclass] || "Sin clasificar";
-      const content = document.createElement("div");
-      const nameLine = document.createElement("p");
-      const categoryLine = document.createElement("p");
-
-      // textContent muestra los nombres como texto, sin interpretar HTML del dato
-      nameLine.textContent = `Nombre: ${name}`;
-      categoryLine.textContent = `Categoría: ${category}`;
-      content.append(nameLine, categoryLine);
-      return content;
-    },
-  });
-
-  // 5. Crear la capa local -> gejson layer
+  // 4. Crear la capa con su renderer. El archivo original no se modifica.
   const greenSpacesLayer = new GeoJSONLayer({
     id: "espacios-verdes-madrid",
     title: "Espacios verdes de Madrid · OpenStreetMap",
@@ -79,8 +52,35 @@ export async function addGreenSpacesLayer(map) {
     geometryType: "polygon",
     outFields: ["osm_id", "name", "fclass"],
     renderer: greenSpacesRenderer,
-    popupTemplate: greenSpacesPopup,
     copyright: "© OpenStreetMap contributors (ODbL)",
+  });
+
+  const categoryLabels = {
+    park: "Parque",
+    forest: "Bosque",
+    recreation_ground: "Zona recreativa",
+  };
+
+  // 5. Mostrar nombre y categoría sin interpretar HTML de los atributos.
+  function createPopupContent(feature) {
+    const attributes = feature.graphic.attributes;
+    let name = (attributes.name || "").trim();
+    if (!name) name = "Espacio verde sin nombre";
+    const category = categoryLabels[attributes.fclass] || "Sin clasificar";
+    const content = document.createElement("div");
+    const nameLine = document.createElement("p");
+    const categoryLine = document.createElement("p");
+    nameLine.textContent = `Nombre: ${name}`;
+    categoryLine.textContent = `Categoría: ${category}`;
+    content.append(nameLine, categoryLine);
+    return content;
+  }
+
+  greenSpacesLayer.popupTemplate = new PopupTemplate({
+    title: "Espacio verde de Madrid",
+    outFields: ["osm_id", "name", "fclass"],
+    returnGeometry: true,
+    content: createPopupContent,
   });
 
   // 6. Añadir al mapa existente y devolver la instancia lista para reutilizarse.
