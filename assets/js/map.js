@@ -158,9 +158,11 @@ export async function initializeMap() {
 
   // La carga de datos tiene su propio error y no bloquea los controles del mapa.
   greenSpacesStatus.textContent = "Cargando espacios verdes…";
+  let greenSpacesLayer = null;
   try {
-    const greenSpacesLayer = await addGreenSpacesLayer(mapElement.map);
-    await mapElement.view.whenLayerView(greenSpacesLayer);
+    const loadedLayer = await addGreenSpacesLayer(mapElement.map);
+    await mapElement.view.whenLayerView(loadedLayer);
+    greenSpacesLayer = loadedLayer;
     if (!failed) greenSpacesStatus.textContent = "Capa disponible";
   } catch {
     greenSpacesStatus.textContent =
@@ -169,7 +171,7 @@ export async function initializeMap() {
 
   if (failed) return;
   try {
-    const controls = await initializeGisAnalysis(mapElement);
+    const controls = await initializeGisAnalysis(mapElement, greenSpacesLayer);
     if (failed) {
       controls?.destroy();
     } else {

@@ -1,6 +1,6 @@
 ﻿# GreenSpot
 
-Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.2: selección de ubicación y buffers geodésicos de 500 y 1.000 metros**, sobre el GeoJSON real de OpenStreetMap integrado en B.1. No hay consultas ni resultados de proximidad. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y la interfaz existente.
+Prototipo WebGIS independiente sobre proximidad a espacios verdes de Madrid. **FASE B.3: consulta espacial de polígonos que intersectan buffers geodésicos de 500 y 1.000 metros**, sobre el GeoJSON real de OpenStreetMap integrado en B.1. Muestra únicamente el número de entidades poligonales encontradas, no parques independientes. No es una herramienta oficial del Ayuntamiento de Madrid. Se conservan el visor de Esri y el diseño existente.
 
 ## Arrancar en VS Code
 
@@ -33,7 +33,7 @@ No hay despliegue preparado ni autorizado. Para un futuro hosting estático habr
 | `assets/js/app.js` | Eventos DOM del menú, cierre con Escape, navegación activa y actualización del radio preparado. Importa e inicia el mapa. |
 | `assets/js/map.js` | Importación local protegida con try/catch, carga diferida del CDN, componente arcgis-map, estados, límites de espera y restablecimiento de vista. |
 | `assets/js/map-layers.js` | Importa clases con `$arcgis.import()`, define símbolos, renderer y popup, añade el GeoJSON al mapa existente y devuelve la capa. |
-| `assets/js/gis-analysis.js` | Prepara el operador geodésico, gestiona el modo de selección y dibuja punto y buffer en una sola `GraphicsLayer`. |
+| `assets/js/gis-analysis.js` | Gestiona selección, buffer geodésico, gráficos y consulta espacial al pulsar Analizar zona. |
 | `assets/js/config.example.js` | Contrato de configuración sin credenciales. |
 | `assets/data/README.md` | Estado y requisitos para las futuras capas. |
 
@@ -43,7 +43,7 @@ El mapa comienza en **longitud −3.7038, latitud 40.4168, zoom 12**, como vista
 
 `data-map-state` en `.viewer` expresa `loading`, `unconfigured`, `ready` o `error`. Los mensajes se actualizan con `textContent` y regiones de estado accesibles. El botón de vuelta se habilita tras `viewOnReady()` y `basemap.loadAll()`. Los errores se presentan sin registrar claves ni objetos de error que puedan incluir URLs con tokens.
 
-El radio vive en los controles nativos; `app.js` refleja la elección en el panel y `gis-analysis.js` actualiza el buffer. `map.js` conserva la carga de B.1 con `addGreenSpacesLayer(mapElement.map)` y llama después a `initializeGisAnalysis(mapElement)`, con su propio manejo de errores. No se crea otro mapa ni se duplica el SDK. La lógica nueva se concentra en `gis-analysis.js`; no se añade otro archivo `analysis.js`.
+El radio vive en los controles nativos; `app.js` refleja la elección en el panel y `gis-analysis.js` actualiza el buffer. `map.js` conserva la carga de B.1 con `addGreenSpacesLayer(mapElement.map)` y pasa esa instancia a `initializeGisAnalysis(mapElement, greenSpacesLayer)`, con su propio manejo de errores. Si la capa no se prepara, pasa `null`: siguen disponibles el mapa y los buffers, pero no la consulta. No se crea otro mapa ni se duplica el SDK. La lógica nueva se concentra en `gis-analysis.js`; no se añade otro archivo `analysis.js`.
 
 ## Cómo estudiar el código
 
@@ -88,7 +88,30 @@ Los eventos y la capa se crean una vez por inicialización. `destroy()` elimina 
 
 Disponibles: landing, anclas, menú móvil con teclado/Escape, enlaces a fuentes y estados del visor. Con clave válida y acceso al CDN: mapa base real, capa GeoJSON categorizada, popup, selección explícita de ubicación, radios 500 m / 1 km, buffer geodésico, zoom, desplazamiento y vuelta a Madrid.
 
-Pendientes tras B.2: leyenda propia, consultas espaciales, resaltado, recuento y listado de proximidad. «Analizar» permanece deshabilitado. El buffer es una visualización geométrica, no un resultado sobre los parques: no se ejecutan `Query`, `queryFeatures()`, intersecciones, estadísticas ni cálculos de superficies. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear datos simulados. La proximidad es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a B.3 sin confirmación.
+### Consulta espacial con Query (B.3)
+
+`updateBuffer()` guarda la geometría válida en `currentBuffer`. Al cambiar el punto o el radio, elimina el resultado anterior y habilita el botón solo si hay buffer y capa disponible. No consulta automáticamente.
+
+El clic en **Analizar zona** llama a `analyzeZone()`, siguiendo el mismo procedimiento que los ejercicios del MásterGIS:
+
+```js
+const query = greenSpacesLayer.createQuery();
+query.geometry = currentBuffer;
+query.spatialRelationship = "intersects";
+query.outFields = ["*"];
+query.returnGeometry = true;
+
+const resultado = await greenSpacesLayer.queryFeatures(query);
+const espaciosEncontrados = resultado.features;
+```
+
+`createQuery()` ya devuelve un objeto `Query`; no requiere importar ni construir otro. `queryFeatures()` consulta los datos de la `GeoJSONLayer` existente y devuelve un `FeatureSet`. Su propiedad `features` contiene las entidades coincidentes, con atributos y geometría. El recuento usa `espaciosEncontrados.length`, incluido el cero, y se muestra con `textContent` en el panel existente. No se limita a los polígonos visibles del mapa ni se vuelve a descargar el GeoJSON.
+
+Mientras espera, el botón queda deshabilitado y el mensaje anuncia la consulta. `queryVersion` es un contador: se incrementa con cada consulta o invalidación. Al recibir una respuesta se compara con el número guardado al empezar; si ya cambió, se ignoran tanto el resultado como los cambios del botón. Esto evita mostrar una respuesta antigua sobre un buffer nuevo. `destroy()` también invalida respuestas pendientes y retira el evento del botón. Un fallo de consulta muestra un aviso y permite reintentar sin retirar el visor.
+
+Referencia: [GeoJSONLayer.createQuery() y queryFeatures(), documentación de Esri](https://developers.arcgis.com/javascript/latest/references/core/layers/GeoJSONLayer/).
+
+Pendientes tras B.3: leyenda propia, resaltado, listados y contraste independiente de resultados en ArcGIS Pro. No se calculan superficies, porcentajes, uniones ni índices. Se usa exclusivamente el GeoJSON entregado por la propietaria, sin descargar capas ni crear datos simulados. La proximidad es **en línea recta**: no representa tiempos caminando, rutas, accesibilidad universal, cobertura demográfica ni accesibilidad por red peatonal. No se avanza a B.4 sin confirmación.
 
 La maqueta original se conserva como referencia y nunca se publica dentro de la página. En la segunda iteración visual se sustituyen las composiciones botánicas por imágenes locales de `assets/img/gallery/`, con procedencia confirmada por la propietaria. El hero utiliza `madrid.jpg`; las tarjetas, `ciudadania.jpg`, `urbanismo.jpg` y `profesionales-gis.png`; el cierre, `madrid-verde.jpg`. La imagen GIS se identifica como ilustración generada con IA. Véanse dimensiones, licencia declarada y créditos pendientes en [el registro de imágenes](assets/img/gallery/README.md).
 
@@ -101,6 +124,19 @@ En Live Server revisa 360, 768, 1024 y 1440 px: ausencia de desbordamiento horiz
 Sin archivo local debe aparecer el estado pendiente. La importación de un archivo local ausente puede producir un 404 en desarrollo; se captura y no impide ejecutar la interfaz. Con clave vacía tampoco se carga el SDK. Con clave válida comprueba la cartografía real; con permisos incorrectos o red interrumpida, el aviso de error. No compartas capturas de red ni consola con tokens.
 
 ## Verificación realizada
+
+### Fase B.3
+
+Pruebas en Edge con el SDK 5.1 real y un servidor HTTP en `http://localhost:5500`, sin modificar ni imprimir la configuración privada:
+
+- Para el punto −3.683, 40.415: 1 entidad poligonal a 500 m y 25 a 1 km. Se compararon los identificadores con una comprobación separada mediante `intersectsOperator` sobre las 2.707 geometrías, proyectadas a la referencia del buffer en el código temporal de prueba. Coincidieron ambos conjuntos; las entidades devueltas conservan geometría y atributos `osm_id`, `name` y `fclass`.
+- Consulta real fuera de la cobertura de la capa: cero resultados mostrado correctamente. Cambio de punto/radio: recuento invalidado y ninguna consulta automática.
+- Se retrasaron respuestas reales para comprobar consultas solapadas, bloqueo de clics repetidos, descarte de respuestas antiguas y conservación del estado de carga de la consulta nueva. También se comprobó el error de consulta y el reintento.
+- Se bloqueó el GeoJSON durante una carga independiente: el mapa base, los controles y el buffer siguieron funcionando; Analizar zona permaneció deshabilitado con explicación.
+- Selección, Escape, popups, ambos buffers y restablecimiento operativos. Una sola petición del GeoJSON, un mapa y dos capas aun tras repetir inicializaciones. Sin excepciones JavaScript ni errores HTTP en la sesión normal. La prueba del fallo de capa provoca deliberadamente un 404.
+- Sin desbordamiento horizontal a 360/768/1024/1440 px. Se conserva el CSS y no se alteran los datos.
+
+Pendientes: contraste independiente de geometrías y recuentos en ArcGIS Pro y prueba desde la extensión Live Server de VS Code; se utilizó un servidor HTTP equivalente. La comprobación separada con otro operador del mismo SDK no sustituye la validación en ArcGIS Pro. No se implementa B.4.
 
 ### Refactorización previa a B.3
 
