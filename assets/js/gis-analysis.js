@@ -72,7 +72,8 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     otherCategoryRow.hidden = true;
     namedSpacesList.replaceChildren();
     namedSpacesList.hidden = true;
-    listMessage.textContent = "Aquí verás los espacios identificados por su nombre.";
+    listMessage.textContent =
+      "Aquí verás los espacios identificados por su nombre.";
   }
 
   // Cuenta las áreas de cada categoría y muestra hasta diez nombres reales.
@@ -123,9 +124,11 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
       namedSpacesList.append(item);
     }
     if (espaciosEncontrados.length === 0) {
-      listMessage.textContent = "No hay espacios verdes registrados en este radio.";
+      listMessage.textContent =
+        "No hay espacios verdes registrados en este radio.";
     } else if (namedSpaces.length === 0) {
-      listMessage.textContent = "Las áreas encontradas no tienen nombre en OpenStreetMap.";
+      listMessage.textContent =
+        "Las áreas encontradas no tienen nombre en OpenStreetMap.";
     } else {
       listMessage.textContent = `Mostrando ${visibleSpaces.length} de ${namedSpaces.length} áreas con nombre.`;
     }
@@ -141,8 +144,10 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     analysisState.textContent = "Sin analizar";
     clearResults();
     if (!greenSpacesLayer) {
-      analysisHelp.textContent = "Los datos no están disponibles. Recarga la página para volver a intentarlo.";
-      analysisResult.textContent = "No se pueden obtener resultados ahora. Puedes seguir explorando el mapa.";
+      analysisHelp.textContent =
+        "Los datos no están disponibles. Recarga la página para volver a intentarlo.";
+      analysisResult.textContent =
+        "No se pueden obtener resultados ahora. Puedes seguir explorando el mapa.";
     } else if (!currentBuffer) {
       analysisHelp.textContent = "Selecciona una ubicación para empezar.";
       analysisResult.textContent = "Tu resumen aparecerá aquí.";
@@ -159,7 +164,9 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     queryVersion += 1;
     const version = queryVersion;
     let radiusLabel = "500 m";
-    if (document.querySelector('input[name="radius"]:checked').value === "1000") {
+    if (
+      document.querySelector('input[name="radius"]:checked').value === "1000"
+    ) {
       radiusLabel = "1 km";
     }
     analyzeButton.disabled = true;
@@ -176,7 +183,8 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     } catch (error) {
       // Un gesto o Restablecer mapa pueden interrumpir la navegación normalmente.
       if (error.name !== "AbortError" && version === queryVersion) {
-        bufferStatus.textContent = "No se ha podido centrar el mapa. Puedes continuar el análisis.";
+        bufferStatus.textContent =
+          "No se ha podido centrar el mapa. Puedes continuar el análisis.";
       }
     }
     if (version !== queryVersion) return;
@@ -201,7 +209,8 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
     } catch {
       if (version !== queryVersion) return;
       analysisState.textContent = "Error de consulta";
-      analysisResult.textContent = "No se han podido obtener los resultados. Vuelve a intentarlo.";
+      analysisResult.textContent =
+        "No se han podido obtener los resultados. Vuelve a intentarlo.";
     } finally {
       // Una consulta antigua tampoco debe cambiar el botón de otra más reciente.
       if (version === queryVersion) {
@@ -274,7 +283,8 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
       if (radius === 1000) radiusLabel = "1.000";
       bufferStatus.textContent = `Ubicación elegida · radio de ${radiusLabel} m.`;
       if (selectingLocation) {
-        bufferStatus.textContent += " Pulsa en el mapa para cambiar la ubicación; Escape cancela.";
+        bufferStatus.textContent +=
+          " Pulsa en el mapa para cambiar la ubicación; Escape cancela.";
       }
     } catch {
       bufferStatus.textContent =
@@ -304,8 +314,7 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
   // Sale del modo de selección sin borrar el punto que ya estaba elegido.
   function cancelSelection() {
     setSelectionMode(false);
-    bufferStatus.textContent =
-      "Selección cancelada.";
+    bufferStatus.textContent = "Selección cancelada.";
   }
 
   function handleEscape(event) {
@@ -324,8 +333,7 @@ export async function initializeGisAnalysis(mapElement, greenSpacesLayer) {
   document.addEventListener("keydown", handleEscape);
   selectButton.disabled = false;
   invalidateAnalysis();
-  bufferStatus.textContent =
-    "Pulsa el botón y elige un punto en el mapa.";
+  bufferStatus.textContent = "Pulsa el botón y elige un punto en el mapa.";
 
   return {
     // Retira los eventos y gráficos si se cierra el visor.
